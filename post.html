@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>墨 SUMI</title>
+<meta name="theme-color" content="#08090b">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' fill='%2308090b'/%3E%3Ccircle cx='50' cy='50' r='30' fill='none' stroke='%23d8442a' stroke-width='7' stroke-dasharray='170 30' stroke-linecap='round'/%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Shippori+Mincho:wght@400;600&family=Inter:wght@300;400;500&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/css/main.css">
+</head>
+<body>
+
+<div class="veil"><div class="veil__mark">墨</div><div class="veil__bar"></div></div>
+<div class="grain"></div>
+<div class="prog"></div>
+
+<nav class="nav">
+  <a class="nav__logo" href="./"><b>墨</b> <span>Sumi</span></a>
+  <div class="nav__links">
+    <a href="./">Trang chủ</a>
+    <a href="admin.html">Viết</a>
+  </div>
+</nav>
+
+<article>
+  <div class="wrap wrap--read art-hero">
+    <div class="eyebrow" id="kicker">Đang mở cuộn giấy…</div>
+    <h1 id="title">&nbsp;</h1>
+    <div class="art-meta" id="meta"></div>
+  </div>
+  <div class="wrap wrap--read">
+    <div class="prose" id="body"></div>
+  </div>
+</article>
+
+<footer class="foot">
+  <div class="wrap wrap--read">
+    <h2 class="foot__big"><a href="./">← Trở về</a></h2>
+    <div class="foot__row">
+      <div>© 2026 Thông · 墨 Sumi</div>
+      <div id="next"></div>
+    </div>
+  </div>
+</footer>
+
+<script src="assets/js/core.js"></script>
+<script src="assets/js/motion.js"></script>
+<script>
+(async () => {
+  const S = window.SUMI;
+  const slug = new URLSearchParams(location.search).get('p') || '';
+  const $ = id => document.getElementById(id);
+
+  if (!/^[a-z0-9-]{1,80}$/.test(slug)) {
+    $('kicker').textContent = 'Lạc đường';
+    $('title').textContent = 'Không tìm thấy bài này';
+    $('body').innerHTML = '<p>Đường dẫn không hợp lệ. <a href="./">Về trang chủ</a>.</p>';
+    return;
+  }
+
+  const posts = await S.loadIndex();
+  const i = posts.findIndex(p => p.slug === slug);
+  const meta = i >= 0 ? posts[i] : { slug, title: slug, date: '' };
+
+  let raw;
+  try { raw = await S.loadPost(slug); }
+  catch (e) {
+    $('kicker').textContent = 'Lạc đường';
+    $('title').textContent = 'Bài viết đã tan như mực trong nước';
+    $('body').innerHTML = '<p>Không tìm thấy nội dung. <a href="./">Về trang chủ</a>.</p>';
+    return;
+  }
+
+  // strip an optional leading "# Title" so it is not printed twice
+  const body = raw.replace(/^﻿/, '').replace(/^\s*#\s+.*\n+/, '');
+
+  document.title = (meta.title || slug) + ' · 墨 SUMI';
+  $('kicker').textContent = meta.tag || 'Ghi chép';
+  $('title').textContent = meta.title || slug;
+  $('meta').innerHTML =
+    (meta.date ? '<span>' + S.esc(S.fmtDate(meta.date)) + '</span>' : '') +
+    '<span>' + S.readTime(body) + ' phút đọc</span>' +
+    '<span>Thông</span>';
+  $('body').innerHTML = S.md(body);
+  const f = $('body').firstElementChild;
+  if (f && f.tagName === 'P') f.classList.add('dropcap');
+
+  const nx = posts[i + 1] || posts[0];
+  if (nx && nx.slug !== slug) {
+    $('next').innerHTML = 'Tiếp: <a class="lnk" href="post.html?p=' +
+      encodeURIComponent(nx.slug) + '">' + S.esc(nx.title || nx.slug) + '</a>';
+  }
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>墨 SUMI — Nhật ký của Thông</title>
+<meta name="description" content="Một khoảng lặng giữa thiền và máy. Ghi chép, chiêm nghiệm, và những gì còn lại sau khi tắt màn hình.">
+<meta name="theme-color" content="#08090b">
+<meta property="og:title" content="墨 SUMI — Nhật ký của Thông">
+<meta property="og:description" content="Một khoảng lặng giữa thiền và máy.">
+<meta property="og:type" content="website">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' fill='%2308090b'/%3E%3Ccircle cx='50' cy='50' r='30' fill='none' stroke='%23d8442a' stroke-width='7' stroke-dasharray='170 30' stroke-linecap='round'/%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Shippori+Mincho:wght@400;600&family=Inter:wght@300;400;500&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/css/main.css">
+</head>
+<body>
+
+<div class="veil"><div class="veil__mark">墨</div><div class="veil__bar"></div></div>
+<div class="grain"></div>
+<div class="prog"></div>
+
+<nav class="nav">
+  <a class="nav__logo" href="./"><b>墨</b> <span>Sumi</span></a>
+  <div class="nav__links">
+    <a href="#viet">Bài viết</a>
+    <a href="#tam" class="opt">Tâm pháp</a>
+    <a href="#lienhe" class="opt">Liên hệ</a>
+    <a href="admin.html">Viết</a>
+  </div>
+</nav>
+
+<!-- ═══ HERO ═══ -->
+<header class="hero">
+  <canvas class="hero__canvas"></canvas>
+  <svg class="enso" viewBox="0 0 200 200" aria-hidden="true">
+    <circle cx="100" cy="100" r="78" transform="rotate(-105 100 100)"/>
+  </svg>
+  <div class="rail" aria-hidden="true">静けさの中に信号がある</div>
+
+  <div class="wrap hero__inner">
+    <div class="eyebrow">Nhật ký &nbsp;·&nbsp; 2026 &nbsp;·&nbsp; Hà Nội</div>
+    <h1>
+      <span class="ln" data-split>Tĩnh</span>
+      <span class="ln" data-split><em>tại</em> giữa</span>
+      <span class="ln" data-split><span class="thin">nhiễu động</span></span>
+    </h1>
+
+    <div class="hero__meta">
+      <p class="hero__lede rise">
+        Tôi viết ở đây khi màn hình đã tắt và đầu vẫn còn sáng.
+        <strong>Không lịch đăng, không KPI, không thuật toán.</strong>
+        Chỉ là mực rơi xuống giấy — đôi khi thành chữ, đôi khi chỉ thành vệt.
+      </p>
+      <div class="hero__stat rise">
+        <b data-count>—</b>
+        bài đã viết
+      </div>
+      <div class="hero__stat rise">
+        <b>無</b>
+        vô thường
+      </div>
+    </div>
+  </div>
+
+  <div class="scrollcue"><i></i> Cuộn xuống</div>
+</header>
+
+<!-- ═══ MANIFESTO (contrast band) ═══ -->
+<section class="band-light manifesto" id="tam">
+  <div class="wrap">
+    <p class="rv" data-split>Máy tính đếm được mọi thứ trừ cái đáng đếm.</p>
+    <p class="off rv" data-split><span class="mk">Nên tôi ngồi xuống,</span></p>
+    <p class="rv" data-split>và để một dòng chữ chạy chậm hơn CPU.</p>
+  </div>
+</section>
+
+<!-- ═══ MARQUEE ═══ -->
+<section class="marquee" aria-hidden="true">
+  <div class="marquee__t">
+    <span>侘寂</span><span>Wabi-Sabi</span><span>無常</span><span>Vô thường</span>
+    <span>禅</span><span>Thiền</span><span>間</span><span>Khoảng trống</span>
+    <span>侘寂</span><span>Wabi-Sabi</span><span>無常</span><span>Vô thường</span>
+    <span>禅</span><span>Thiền</span><span>間</span><span>Khoảng trống</span>
+  </div>
+</section>
+
+<!-- ═══ POSTS ═══ -->
+<section class="posts" id="viet">
+  <div class="wrap">
+    <div class="shead">
+      <h2 data-split>Những gì <i>đã viết</i></h2>
+      <div class="shead__n">目次 · Mục lục</div>
+    </div>
+    <div id="list">
+      <div class="empty">Đang mài mực…</div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══ TRIO ═══ -->
+<section class="band-light">
+  <div class="wrap">
+    <div class="shead">
+      <h2 data-split>Ba điều <i>tôi tin</i></h2>
+      <div class="shead__n">三則 · Tam tắc</div>
+    </div>
+    <div class="trio">
+      <article class="cell rise">
+        <div class="cell__n">01</div>
+        <div class="cell__k">間</div>
+        <div>
+          <h3>Khoảng trống là nội dung</h3>
+          <p>Cái không nói ra giữ được nhiều hơn cái nói ra. Thiết kế, code, hay một buổi chiều — đều vậy.</p>
+        </div>
+      </article>
+      <article class="cell rise">
+        <div class="cell__n">02</div>
+        <div class="cell__k">拙</div>
+        <div>
+          <h3>Vụng về là thật</h3>
+          <p>Bản nháp có nhịp thở. Bản hoàn hảo thường đã chết. Tôi đăng cả hai, và thích bản đầu hơn.</p>
+        </div>
+      </article>
+      <article class="cell rise">
+        <div class="cell__n">03</div>
+        <div class="cell__k">流</div>
+        <div>
+          <h3>Trôi chứ không đứng</h3>
+          <p>Ý kiến hôm nay là ghi chú, không phải bia đá. Ai đọc lại thấy tôi mâu thuẫn — thế là tôi còn sống.</p>
+        </div>
+      </article>
+    </div>
+  </div>
+</section>
+
+<!-- ═══ FOOTER ═══ -->
+<footer class="foot" id="lienhe">
+  <div class="wrap">
+    <h2 class="foot__big" data-split>Nói chuyện <br>không vội.</h2>
+    <div class="foot__row">
+      <div>© 2026 Thông · 墨 Sumi</div>
+      <div><a class="lnk" href="admin.html">Đăng nhập &amp; viết</a></div>
+      <div>一期一会 · Ichigo Ichie</div>
+    </div>
+  </div>
+</footer>
+
+<script src="assets/js/core.js"></script>
+<script src="assets/js/motion.js"></script>
+<script>
+(async () => {
+  const S = window.SUMI;
+  const list = document.getElementById('list');
+  const posts = await S.loadIndex();
+
+  const n = document.querySelector('[data-count]');
+  if (n) n.textContent = String(posts.length).padStart(2, '0');
+
+  if (!posts.length) {
+    list.innerHTML = '<div class="empty">Chưa có bài nào — <a class="lnk" href="admin.html">viết bài đầu tiên</a></div>';
+    return;
+  }
+
+  list.innerHTML = posts.map((p, i) => `
+    <a class="post-row rise" href="post.html?p=${encodeURIComponent(p.slug)}">
+      <div class="p-idx">${String(i + 1).padStart(2, '0')} —</div>
+      <h3 class="p-title">${S.esc(p.title || 'Không đề')}</h3>
+      <div class="p-dek">${S.esc(p.excerpt || '')}</div>
+      <div class="p-meta">
+        ${S.fmtDate(p.date)}
+        ${p.tag ? `<br><span class="p-tag">${S.esc(p.tag)}</span>` : ''}
+      </div>
+    </a>`).join('');
+
+  if (window.__observeAll) window.__observeAll(list);
+  else list.querySelectorAll('.rise').forEach(el => el.classList.add('in'));
+})();
+</script>
+</body>
+</html>

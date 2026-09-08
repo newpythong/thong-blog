@@ -132,7 +132,8 @@
   /* ── ink field canvas ──────────────────────── */
   const cv = document.querySelector('.hero__canvas');
   if (cv && !RM) {
-    const ctx = cv.getContext && cv.getContext('2d');
+    let ctx = null;
+    try { ctx = cv.getContext && cv.getContext('2d'); } catch (e) { /* canvas unavailable */ }
     if (!ctx) return;
     let W, H, dpr, nodes = [], t = 0;
     const N = innerWidth < 760 ? 34 : 70;

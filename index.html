@@ -3,63 +3,60 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>墨 SUMI — Nhật ký của Thông</title>
+<title>Mực — Nhật ký của Thông</title>
+<meta name="theme-color" content="#f7efdb">
 <meta name="description" content="Một khoảng lặng giữa thiền và máy. Ghi chép, chiêm nghiệm, và những gì còn lại sau khi tắt màn hình.">
-<meta name="theme-color" content="#08090b">
-<meta property="og:title" content="墨 SUMI — Nhật ký của Thông">
+<meta property="og:title" content="Mực — Nhật ký của Thông">
 <meta property="og:description" content="Một khoảng lặng giữa thiền và máy.">
 <meta property="og:type" content="website">
-<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' fill='%2308090b'/%3E%3Ccircle cx='50' cy='50' r='30' fill='none' stroke='%23d8442a' stroke-width='7' stroke-dasharray='170 30' stroke-linecap='round'/%3E%3C/svg%3E">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' fill='%23f7efdb'/%3E%3Cpath d='M6 76 L34 34 L50 58 L64 26 L94 76 Z' fill='%23b4441f'/%3E%3C/svg%3E">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Shippori+Mincho:wght@400;600&family=Inter:wght@300;400;500&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,200..600;1,6..72,200..500&family=Be+Vietnam+Pro:ital,wght@0,300;0,400;0,500;0,600;1,400&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="assets/css/main.css">
 </head>
 <body>
 
-<div class="veil"><div class="veil__mark">墨</div><div class="veil__bar"></div></div>
+<div class="veil">
+  <svg class="veil__mark" viewBox="0 0 120 60" aria-hidden="true">
+    <path d="M2 56 L30 18 L46 40 L64 8 L86 38 L100 24 L118 56 Z"/>
+  </svg>
+  <div class="veil__bar"></div>
+</div>
 <div class="grain"></div>
 <div class="prog"></div>
 
 <nav class="nav">
-  <a class="nav__logo" href="./"><b>墨</b> <span>Sumi</span></a>
+  <a class="nav__logo" href="./">
+    <svg class="mk" viewBox="0 0 40 22" aria-hidden="true"><path d="M1 20 L11 6 L17 14 L23 2 L31 13 L39 20 Z"/></svg>
+    <b>Mực</b>
+  </a>
   <div class="nav__links">
     <a href="#viet">Bài viết</a>
-    <a href="#tam" class="opt">Tâm pháp</a>
-    <a href="#lienhe" class="opt">Liên hệ</a>
+    <a href="#tin" class="opt">Điều tôi tin</a>
+    <a href="#cuoi" class="opt">Liên hệ</a>
     <a href="admin.html">Viết</a>
   </div>
 </nav>
 
-<!-- ═══ HERO ═══ -->
 <header class="hero">
-  <canvas class="hero__canvas"></canvas>
-  <svg class="enso" viewBox="0 0 200 200" aria-hidden="true">
-    <circle cx="100" cy="100" r="78" transform="rotate(-105 100 100)"/>
-  </svg>
-  <div class="rail" aria-hidden="true">静けさの中に信号がある</div>
-
+  <canvas class="hero__canvas" aria-hidden="true"></canvas>
+  <div class="hero__fade" aria-hidden="true"></div>
   <div class="wrap hero__inner">
-    <div class="eyebrow">Nhật ký &nbsp;·&nbsp; 2026 &nbsp;·&nbsp; Hà Nội</div>
+    <div class="eyebrow rise">Nhật ký của Thông &nbsp;·&nbsp; Hà Nội</div>
     <h1>
-      <span class="ln" data-split>Tĩnh</span>
-      <span class="ln" data-split><em>tại</em> giữa</span>
-      <span class="ln" data-split><span class="thin">nhiễu động</span></span>
+      <span class="ln" data-split>Tĩnh tại</span>
+      <span class="ln" data-split>giữa <em>nhiễu động</em></span>
     </h1>
-
     <div class="hero__meta">
       <p class="hero__lede rise">
         Tôi viết ở đây khi màn hình đã tắt và đầu vẫn còn sáng.
-        <strong>Không lịch đăng, không KPI, không thuật toán.</strong>
+        <strong>Không lịch đăng, không thành tích, không thuật toán.</strong>
         Chỉ là mực rơi xuống giấy — đôi khi thành chữ, đôi khi chỉ thành vệt.
       </p>
       <div class="hero__stat rise">
         <b data-count>—</b>
         bài đã viết
-      </div>
-      <div class="hero__stat rise">
-        <b>無</b>
-        vô thường
       </div>
     </div>
   </div>
@@ -67,65 +64,64 @@
   <div class="scrollcue"><i></i> Cuộn xuống</div>
 </header>
 
-<!-- ═══ MANIFESTO (contrast band) ═══ -->
-<section class="band-light manifesto" id="tam">
+<section class="band-deep manifesto">
   <div class="wrap">
     <p class="rv" data-split>Máy tính đếm được mọi thứ trừ cái đáng đếm.</p>
-    <p class="off rv" data-split><span class="mk">Nên tôi ngồi xuống,</span></p>
-    <p class="rv" data-split>và để một dòng chữ chạy chậm hơn CPU.</p>
+    <p class="off rv" data-split><span class="mk-t">Nên tôi ngồi xuống,</span></p>
+    <p class="rv" data-split>và để một dòng chữ chạy chậm hơn con chip.</p>
   </div>
 </section>
 
-<!-- ═══ MARQUEE ═══ -->
 <section class="marquee" aria-hidden="true">
   <div class="marquee__t">
-    <span>侘寂</span><span>Wabi-Sabi</span><span>無常</span><span>Vô thường</span>
-    <span>禅</span><span>Thiền</span><span>間</span><span>Khoảng trống</span>
-    <span>侘寂</span><span>Wabi-Sabi</span><span>無常</span><span>Vô thường</span>
-    <span>禅</span><span>Thiền</span><span>間</span><span>Khoảng trống</span>
+    <span>Chậm lại</span><span>Trống</span><span>Vụng về</span><span>Vô thường</span><span>Lặng</span><span>Trôi</span>
+    <span>Chậm lại</span><span>Trống</span><span>Vụng về</span><span>Vô thường</span><span>Lặng</span><span>Trôi</span>
   </div>
 </section>
 
-<!-- ═══ POSTS ═══ -->
 <section class="posts" id="viet">
   <div class="wrap">
     <div class="shead">
       <h2 data-split>Những gì <i>đã viết</i></h2>
-      <div class="shead__n">目次 · Mục lục</div>
+      <div class="shead__n">Mục lục</div>
     </div>
-    <div id="list">
-      <div class="empty">Đang mài mực…</div>
-    </div>
+    <div id="list"><div class="empty">Đang mài mực…</div></div>
   </div>
 </section>
 
-<!-- ═══ TRIO ═══ -->
-<section class="band-light">
+<div class="ridge" aria-hidden="true">
+  <svg viewBox="0 0 1440 220" preserveAspectRatio="none">
+    <path class="r1" d="M0 220 L0 38.0 L5 37.4 L10 37.6 L15 39.3 L20 41.7 L25 44.0 L30 46.4 L35 50.7 L40 53.2 L45 53.2 L50 53.5 L55 54.3 L60 53.9 L65 52.6 L70 51.7 L75 51.3 L80 51.0 L85 51.2 L90 51.0 L95 51.0 L100 51.7 L105 53.2 L110 56.0 L115 59.3 L120 61.7 L125 63.5 L130 65.4 L135 66.9 L140 66.6 L145 65.6 L150 62.8 L155 59.1 L160 57.3 L165 55.7 L170 54.5 L175 55.4 L180 58.2 L185 60.1 L190 60.4 L195 59.6 L200 57.5 L205 58.2 L210 61.8 L215 64.3 L220 65.7 L225 68.5 L230 71.1 L235 70.5 L240 69.2 L245 67.7 L250 66.4 L255 68.0 L260 69.6 L265 69.5 L270 69.2 L275 69.1 L280 69.1 L285 69.3 L290 68.2 L295 64.3 L300 59.9 L305 55.5 L310 52.4 L315 51.9 L320 52.0 L325 52.4 L330 51.9 L335 49.9 L340 48.5 L345 46.4 L350 45.3 L355 44.3 L360 42.4 L365 40.6 L370 39.9 L375 39.7 L380 37.4 L385 35.1 L390 34.7 L395 34.6 L400 34.4 L405 33.2 L410 31.3 L415 30.1 L420 29.0 L425 28.7 L430 27.9 L435 27.6 L440 29.4 L445 31.8 L450 35.2 L455 38.0 L460 39.2 L465 41.5 L470 45.3 L475 47.9 L480 50.7 L485 53.5 L490 55.1 L495 56.9 L500 57.7 L505 56.0 L510 53.8 L515 52.6 L520 52.6 L525 51.5 L530 51.2 L535 52.6 L540 53.5 L545 54.6 L550 55.6 L555 57.0 L560 57.7 L565 58.6 L570 58.4 L575 56.7 L580 56.8 L585 57.9 L590 57.8 L595 56.5 L600 56.3 L605 57.2 L610 58.9 L615 61.0 L620 60.5 L625 57.7 L630 54.7 L635 51.6 L640 48.9 L645 47.5 L650 48.9 L655 50.3 L660 49.0 L665 47.6 L670 47.9 L675 48.1 L680 47.3 L685 45.8 L690 43.6 L695 40.7 L700 38.6 L705 37.5 L710 37.4 L715 38.1 L720 39.3 L725 40.8 L730 42.0 L735 42.0 L740 41.6 L745 42.3 L750 44.0 L755 44.9 L760 44.8 L765 43.5 L770 41.3 L775 41.6 L780 42.1 L785 40.5 L790 38.8 L795 38.7 L800 38.9 L805 38.8 L810 38.9 L815 37.4 L820 37.1 L825 39.3 L830 40.3 L835 38.4 L840 37.6 L845 39.0 L850 39.3 L855 39.7 L860 40.8 L865 40.7 L870 41.9 L875 43.4 L880 43.1 L885 42.7 L890 42.6 L895 42.1 L900 41.2 L905 40.3 L910 38.9 L915 38.7 L920 39.8 L925 41.1 L930 43.0 L935 43.5 L940 43.1 L945 42.5 L950 41.4 L955 41.8 L960 41.8 L965 42.6 L970 44.0 L975 44.7 L980 46.1 L985 48.8 L990 52.3 L995 52.8 L1000 50.9 L1005 49.9 L1010 49.4 L1015 49.9 L1020 52.1 L1025 54.0 L1030 55.2 L1035 54.2 L1040 52.0 L1045 49.3 L1050 46.9 L1055 46.6 L1060 46.6 L1065 47.2 L1070 48.0 L1075 47.7 L1080 48.2 L1085 49.9 L1090 50.1 L1095 50.1 L1100 51.4 L1105 52.5 L1110 54.9 L1115 57.8 L1120 59.6 L1125 60.7 L1130 62.5 L1135 64.4 L1140 64.8 L1145 64.9 L1150 66.9 L1155 68.4 L1160 69.1 L1165 68.5 L1170 67.3 L1175 65.8 L1180 65.0 L1185 64.4 L1190 61.8 L1195 60.1 L1200 59.7 L1205 59.3 L1210 59.0 L1215 60.2 L1220 62.2 L1225 63.6 L1230 65.6 L1235 66.4 L1240 65.9 L1245 66.0 L1250 65.7 L1255 64.7 L1260 63.1 L1265 62.6 L1270 62.9 L1275 60.6 L1280 58.0 L1285 57.1 L1290 56.7 L1295 56.0 L1300 55.7 L1305 56.2 L1310 56.6 L1315 57.2 L1320 57.5 L1325 57.1 L1330 56.4 L1335 54.9 L1340 53.5 L1345 53.1 L1350 52.6 L1355 51.5 L1360 50.8 L1365 50.7 L1370 50.2 L1375 49.3 L1380 48.6 L1385 46.5 L1390 45.0 L1395 43.8 L1400 40.5 L1405 36.6 L1410 34.2 L1415 31.9 L1420 29.3 L1425 27.9 L1430 26.2 L1435 25.3 L1440 27.6 L1440 220 Z"/>
+    <path class="r2" d="M0 220 L0 110.4 L5 113.9 L10 116.1 L15 116.7 L20 117.4 L25 114.6 L30 113.0 L35 111.8 L40 109.8 L45 107.8 L50 107.1 L55 107.4 L60 106.9 L65 107.8 L70 107.7 L75 109.8 L80 112.1 L85 113.6 L90 112.9 L95 113.0 L100 113.1 L105 112.2 L110 113.0 L115 111.8 L120 114.2 L125 115.8 L130 116.4 L135 116.4 L140 114.7 L145 117.4 L150 119.0 L155 118.4 L160 115.4 L165 114.9 L170 117.7 L175 121.2 L180 119.8 L185 121.1 L190 119.5 L195 117.9 L200 117.0 L205 115.3 L210 117.9 L215 117.4 L220 118.3 L225 120.4 L230 121.6 L235 121.8 L240 120.2 L245 117.8 L250 115.8 L255 118.0 L260 118.3 L265 117.7 L270 118.1 L275 118.2 L280 118.2 L285 118.3 L290 120.0 L295 119.1 L300 121.4 L305 122.7 L310 122.2 L315 120.9 L320 121.3 L325 120.7 L330 117.7 L335 113.4 L340 110.3 L345 105.2 L350 101.4 L355 97.0 L360 93.1 L365 90.5 L370 85.2 L375 81.9 L380 78.4 L385 76.9 L390 76.4 L395 78.1 L400 80.9 L405 82.3 L410 84.3 L415 88.2 L420 90.3 L425 90.8 L430 93.1 L435 94.0 L440 94.4 L445 95.0 L450 96.2 L455 96.2 L460 96.9 L465 97.1 L470 97.4 L475 97.9 L480 97.3 L485 97.2 L490 96.6 L495 97.3 L500 93.9 L505 93.9 L510 94.1 L515 96.0 L520 99.1 L525 97.2 L530 99.4 L535 101.1 L540 102.3 L545 100.4 L550 98.6 L555 96.7 L560 96.4 L565 95.6 L570 94.9 L575 95.4 L580 96.6 L585 96.8 L590 94.8 L595 96.3 L600 95.5 L605 93.6 L610 95.0 L615 98.0 L620 102.8 L625 103.2 L630 100.8 L635 101.5 L640 102.5 L645 101.2 L650 100.5 L655 99.9 L660 99.8 L665 101.1 L670 100.4 L675 99.4 L680 98.6 L685 98.3 L690 95.9 L695 93.9 L700 91.9 L705 88.9 L710 90.8 L715 92.0 L720 93.8 L725 92.8 L730 94.6 L735 96.9 L740 102.1 L745 104.1 L750 108.6 L755 109.4 L760 112.0 L765 114.8 L770 116.4 L775 117.5 L780 114.2 L785 111.3 L790 107.5 L795 104.3 L800 100.3 L805 99.7 L810 101.4 L815 101.0 L820 100.7 L825 102.7 L830 104.4 L835 101.3 L840 100.7 L845 98.9 L850 97.0 L855 95.4 L860 93.0 L865 93.5 L870 95.3 L875 97.0 L880 97.7 L885 99.8 L890 102.0 L895 105.1 L900 106.7 L905 106.2 L910 105.3 L915 106.4 L920 107.4 L925 107.7 L930 111.8 L935 110.9 L940 111.1 L945 110.0 L950 112.1 L955 112.1 L960 110.8 L965 109.8 L970 108.7 L975 109.0 L980 106.8 L985 105.0 L990 103.3 L995 104.7 L1000 104.7 L1005 106.1 L1010 105.7 L1015 102.5 L1020 101.5 L1025 100.3 L1030 101.5 L1035 102.6 L1040 99.8 L1045 99.6 L1050 98.5 L1055 100.9 L1060 103.6 L1065 103.3 L1070 103.5 L1075 106.6 L1080 109.4 L1085 109.9 L1090 110.7 L1095 110.0 L1100 110.2 L1105 109.0 L1110 108.4 L1115 104.3 L1120 102.9 L1125 102.2 L1130 100.3 L1135 99.1 L1140 102.1 L1145 103.5 L1150 103.6 L1155 103.8 L1160 105.4 L1165 106.7 L1170 106.3 L1175 106.3 L1180 105.3 L1185 107.2 L1190 106.6 L1195 104.2 L1200 104.3 L1205 107.0 L1210 108.6 L1215 109.3 L1220 108.0 L1225 104.4 L1230 101.8 L1235 100.6 L1240 99.7 L1245 96.9 L1250 97.6 L1255 96.0 L1260 94.2 L1265 90.7 L1270 87.5 L1275 85.6 L1280 86.2 L1285 87.2 L1290 89.6 L1295 91.6 L1300 91.4 L1305 91.7 L1310 91.3 L1315 92.3 L1320 89.5 L1325 88.7 L1330 89.9 L1335 90.7 L1340 91.5 L1345 87.6 L1350 82.7 L1355 81.4 L1360 82.9 L1365 85.0 L1370 85.8 L1375 87.2 L1380 89.5 L1385 91.1 L1390 91.4 L1395 91.9 L1400 92.0 L1405 93.2 L1410 90.9 L1415 92.9 L1420 95.8 L1425 95.0 L1430 94.7 L1435 94.9 L1440 97.0 L1440 220 Z"/>
+  </svg>
+</div>
+
+<section class="band-deep" id="tin">
   <div class="wrap">
     <div class="shead">
       <h2 data-split>Ba điều <i>tôi tin</i></h2>
-      <div class="shead__n">三則 · Tam tắc</div>
+      <div class="shead__n">Tâm pháp</div>
     </div>
     <div class="trio">
       <article class="cell rise">
-        <div class="cell__n">01</div>
-        <div class="cell__k">間</div>
+        <div class="cell__n">Một</div>
+        <div class="cell__k">Trống</div>
         <div>
           <h3>Khoảng trống là nội dung</h3>
-          <p>Cái không nói ra giữ được nhiều hơn cái nói ra. Thiết kế, code, hay một buổi chiều — đều vậy.</p>
+          <p>Cái không nói ra giữ được nhiều hơn cái nói ra. Thiết kế, mã nguồn, hay một buổi chiều — đều vậy.</p>
         </div>
       </article>
       <article class="cell rise">
-        <div class="cell__n">02</div>
-        <div class="cell__k">拙</div>
+        <div class="cell__n">Hai</div>
+        <div class="cell__k">Vụng</div>
         <div>
           <h3>Vụng về là thật</h3>
           <p>Bản nháp có nhịp thở. Bản hoàn hảo thường đã chết. Tôi đăng cả hai, và thích bản đầu hơn.</p>
         </div>
       </article>
       <article class="cell rise">
-        <div class="cell__n">03</div>
-        <div class="cell__k">流</div>
+        <div class="cell__n">Ba</div>
+        <div class="cell__k">Trôi</div>
         <div>
           <h3>Trôi chứ không đứng</h3>
           <p>Ý kiến hôm nay là ghi chú, không phải bia đá. Ai đọc lại thấy tôi mâu thuẫn — thế là tôi còn sống.</p>
@@ -135,14 +131,13 @@
   </div>
 </section>
 
-<!-- ═══ FOOTER ═══ -->
-<footer class="foot" id="lienhe">
+<footer class="foot" id="cuoi">
   <div class="wrap">
     <h2 class="foot__big" data-split>Nói chuyện <br>không vội.</h2>
     <div class="foot__row">
-      <div>© 2026 Thông · 墨 Sumi</div>
+      <div>© 2026 Thông</div>
       <div><a class="lnk" href="admin.html">Đăng nhập &amp; viết</a></div>
-      <div>一期一会 · Ichigo Ichie</div>
+      <div>Gặp một lần, quý một lần</div>
     </div>
   </div>
 </footer>

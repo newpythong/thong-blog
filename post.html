@@ -3,22 +3,30 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>墨 SUMI</title>
-<meta name="theme-color" content="#08090b">
-<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' fill='%2308090b'/%3E%3Ccircle cx='50' cy='50' r='30' fill='none' stroke='%23d8442a' stroke-width='7' stroke-dasharray='170 30' stroke-linecap='round'/%3E%3C/svg%3E">
+<title>Mực</title>
+<meta name="theme-color" content="#f7efdb">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' fill='%23f7efdb'/%3E%3Cpath d='M6 76 L34 34 L50 58 L64 26 L94 76 Z' fill='%23b4441f'/%3E%3C/svg%3E">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Shippori+Mincho:wght@400;600&family=Inter:wght@300;400;500&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,200..600;1,6..72,200..500&family=Be+Vietnam+Pro:ital,wght@0,300;0,400;0,500;0,600;1,400&family=JetBrains+Mono:wght@400;500&family=Shippori+Mincho:wght@400;600&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="assets/css/main.css">
 </head>
 <body>
 
-<div class="veil"><div class="veil__mark">墨</div><div class="veil__bar"></div></div>
+<div class="veil">
+  <svg class="veil__mark" viewBox="0 0 120 60" aria-hidden="true">
+    <path d="M2 56 L30 18 L46 40 L64 8 L86 38 L100 24 L118 56 Z"/>
+  </svg>
+  <div class="veil__bar"></div>
+</div>
 <div class="grain"></div>
 <div class="prog"></div>
 
 <nav class="nav">
-  <a class="nav__logo" href="./"><b>墨</b> <span>Sumi</span></a>
+  <a class="nav__logo" href="./">
+    <svg class="mk" viewBox="0 0 40 22" aria-hidden="true"><path d="M1 20 L11 6 L17 14 L23 2 L31 13 L39 20 Z"/></svg>
+    <b>Mực</b>
+  </a>
   <div class="nav__links">
     <a href="./">Trang chủ</a>
     <a href="admin.html">Viết</a>
@@ -40,7 +48,7 @@
   <div class="wrap wrap--read">
     <h2 class="foot__big"><a href="./">← Trở về</a></h2>
     <div class="foot__row">
-      <div>© 2026 Thông · 墨 Sumi</div>
+      <div>© 2026 Thông</div>
       <div id="next"></div>
     </div>
   </div>
@@ -77,7 +85,7 @@
   // strip an optional leading "# Title" so it is not printed twice
   const body = raw.replace(/^﻿/, '').replace(/^\s*#\s+.*\n+/, '');
 
-  document.title = (meta.title || slug) + ' · 墨 SUMI';
+  document.title = (meta.title || slug) + ' · Mực';
   $('kicker').textContent = meta.tag || 'Ghi chép';
   $('title').textContent = meta.title || slug;
   $('meta').innerHTML =

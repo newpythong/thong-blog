@@ -1,0 +1,142 @@
+/* ═══════════════════════════════════════════════════════════
+   TRANG VIẾT BÀI — mặt giấy, thanh công cụ, danh sách bài
+   Quill mang theo bộ áo riêng; ở đây mặc lại cho khớp với blog.
+   ═══════════════════════════════════════════════════════════ */
+
+.gate__box--wide{ width:min(100%,560px); }
+.hint{ font-family:var(--sans); text-transform:none; letter-spacing:0;
+  color:var(--muc-3); font-weight:400; }
+.help{ font-size:.8rem; line-height:1.75; color:var(--fg-dim); margin-top:.5rem; }
+.help a{ color:var(--dat); border-bottom:1px solid color-mix(in oklab,var(--dat) 40%,transparent); }
+.help .hot{ color:var(--son); }
+.inp-row{ display:flex; gap:.5rem; align-items:stretch; }
+.inp-row .inp{ flex:1; }
+.inp--xs{ padding:.42rem .6rem; font-size:.78rem; width:auto; }
+.inp--slug{ min-width:12rem; }
+.btn--sm{ padding:.55rem 1rem; font-size:.6rem; letter-spacing:.16em; }
+
+/* ── thanh trên ── */
+.ed{ padding:6.5rem 0 5rem; }
+.ed__bar{ display:flex; justify-content:space-between; align-items:flex-end; gap:1rem;
+  flex-wrap:wrap; padding-bottom:1.2rem; border-bottom:1px solid var(--rule);
+  margin-bottom:1.6rem; }
+.ed__actions{ display:flex; gap:.6rem; flex-wrap:wrap; }
+
+/* ── mặt giấy ── */
+.ed__paper{
+  background:var(--lua-2); border:1px solid var(--vien); border-radius:5px;
+  padding:clamp(1.4rem,3.5vw,2.8rem);
+}
+.ed__title{
+  display:block; width:100%; background:none; border:0; padding:0;
+  font-family:var(--serif); font-weight:300; color:var(--tram);
+  font-size:clamp(1.9rem,4.4vw,3.1rem); line-height:1.14; letter-spacing:-.025em;
+}
+.ed__title::placeholder{ color:color-mix(in oklab,var(--muc-3) 70%,transparent); }
+.ed__title:focus{ outline:none; }
+
+.ed__dek{
+  display:block; width:100%; background:none; border:0; padding:0;
+  margin-top:.75rem; font-family:var(--sans); font-size:1rem; color:var(--muc-2);
+}
+.ed__dek::placeholder{ color:var(--muc-3); }
+.ed__dek:focus{ outline:none; }
+
+.ed__meta{
+  display:flex; flex-wrap:wrap; gap:.7rem 1.4rem; align-items:center;
+  margin:1.3rem 0 .3rem; padding:.9rem 0; border-block:1px solid var(--vien);
+}
+.ed__meta label{ display:flex; align-items:center; gap:.5rem;
+  font-family:var(--mono); font-size:.62rem; letter-spacing:.16em;
+  text-transform:uppercase; color:var(--fg-faint); }
+.ed__meta .chk{ font-family:var(--sans); font-size:.82rem; letter-spacing:0;
+  text-transform:none; color:var(--fg-dim); }
+
+.ed__foot{ display:flex; justify-content:space-between; gap:1rem; flex-wrap:wrap;
+  margin-top:.9rem; font-family:var(--mono); font-size:.62rem; letter-spacing:.12em;
+  text-transform:uppercase; color:var(--fg-faint); }
+
+/* ── Quill mặc lại áo ── */
+.ql-toolbar.ql-snow{
+  border:0; border-bottom:1px solid var(--vien);
+  padding:.55rem 0 .8rem; margin-bottom:.6rem;
+  position:sticky; top:4.1rem; z-index:5;
+  background:var(--lua-2);
+}
+.ql-container.ql-snow{ border:0; font-family:var(--serif); }
+.ql-editor{
+  padding:1.2rem 0 2rem; min-height:46svh;
+  font-family:var(--serif); font-size:1.16rem; line-height:1.78; color:var(--fg);
+  font-optical-sizing:auto;
+}
+.ql-editor.ql-blank::before{
+  left:0; right:0; font-style:normal; color:var(--muc-3);
+  font-family:var(--serif); font-size:1.16rem;
+}
+.ql-editor p{ margin:0 0 1.15rem; }
+.ql-editor h2{ font-family:var(--serif); font-weight:300; color:var(--tram);
+  font-size:1.95rem; line-height:1.22; letter-spacing:-.02em; margin:2.2rem 0 .8rem; }
+.ql-editor h3{ font-family:var(--serif); font-weight:600; font-size:1.3rem;
+  margin:1.8rem 0 .6rem; }
+.ql-editor blockquote{
+  border-left:2px solid var(--son); padding-left:1.4rem; margin:1.8rem 0;
+  font-style:italic; font-weight:300; font-size:1.32rem; color:var(--tram);
+}
+.ql-editor pre{
+  background:var(--tram); color:var(--lua); border-radius:4px;
+  padding:1rem 1.2rem; font-family:var(--mono); font-size:.84rem; line-height:1.7;
+  white-space:pre-wrap; overflow-x:auto;
+}
+.ql-editor a{ color:var(--dat); text-decoration:underline; }
+.ql-editor img{ max-width:100%; border-radius:3px; margin:1.4rem 0; }
+.ql-editor ul,.ql-editor ol{ padding-left:1.4rem; }
+.ql-editor li{ margin-bottom:.4rem; }
+
+.ql-snow .ql-stroke{ stroke:var(--muc-2); }
+.ql-snow .ql-fill{ fill:var(--muc-2); }
+.ql-snow .ql-picker{ color:var(--muc-2); }
+.ql-snow .ql-picker-options{ background:var(--lua); border-color:var(--vien);
+  border-radius:4px; }
+.ql-snow button:hover .ql-stroke,
+.ql-snow button.ql-active .ql-stroke,
+.ql-snow .ql-picker-label:hover .ql-stroke,
+.ql-snow .ql-picker-item:hover .ql-stroke{ stroke:var(--son) !important; }
+.ql-snow button:hover .ql-fill,
+.ql-snow button.ql-active .ql-fill{ fill:var(--son) !important; }
+.ql-snow .ql-picker-label:hover,
+.ql-snow .ql-picker-item:hover,
+.ql-snow .ql-picker-label.ql-active{ color:var(--son) !important; }
+.ql-snow .ql-tooltip{ background:var(--lua); border:1px solid var(--vien);
+  box-shadow:0 6px 22px rgba(43,33,23,.12); border-radius:4px; color:var(--fg); }
+.ql-snow .ql-tooltip input[type=text]{ border:1px solid var(--vien); background:var(--lua-2);
+  color:var(--fg); border-radius:3px; }
+.ql-snow .ql-tooltip a.ql-action,
+.ql-snow .ql-tooltip a.ql-remove{ color:var(--son); }
+
+/* ── danh sách bài ── */
+.ed__list{ margin-top:2.5rem; padding-top:1.6rem; border-top:1px solid var(--rule); }
+.mine{ display:grid; gap:.45rem; }
+.mine__i{ display:flex; justify-content:space-between; gap:1rem; align-items:center;
+  padding:.75rem .95rem; border:1px solid var(--vien); border-radius:4px;
+  background:var(--lua-2); font-size:.88rem; transition:border-color .35s var(--ease); }
+.mine__i:hover{ border-color:var(--muc-3); }
+.mine__i small{ font-family:var(--mono); font-size:.6rem; letter-spacing:.12em;
+  color:var(--fg-faint); text-transform:uppercase; }
+.mine__act{ display:flex; gap:1rem; white-space:nowrap; }
+
+/* ── đang gửi ── */
+.busy{ position:relative; pointer-events:none; opacity:.55; }
+
+@media(max-width:640px){
+  .ql-toolbar.ql-snow{ position:static; }
+  .ed__meta{ gap:.6rem 1rem; }
+  .ed__meta label{ font-size:.58rem; }
+}
+
+/* vùng soạn thảo là contenteditable nên dính :focus-visible toàn cục,
+   trông như một khung báo lỗi — bỏ viền, Quill tự có con trỏ nháy */
+.ql-editor:focus,
+.ql-editor:focus-visible,
+.ql-container:focus-within{ outline:none !important; }
+.ed__title:focus-visible,
+.ed__dek:focus-visible{ outline:none; box-shadow:0 2px 0 var(--son); }

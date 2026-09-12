@@ -48,6 +48,8 @@
 }
 
 *,*::before,*::after{ box-sizing:border-box; }
+/* .gate đặt display:grid nên đè mất [hidden] mặc định của trình duyệt */
+[hidden]{ display:none !important; }
 html{ -webkit-text-size-adjust:100%; }
 
 body{
@@ -147,6 +149,20 @@ section{ position:relative; }
   transition:transform .5s var(--ease);
 }
 .nav__links a:hover::after{ transform:scaleX(1); transform-origin:left; }
+/* nút gọi vào trang viết — khác hẳn các mục còn lại */
+.nav__cta{
+  border:1px solid var(--son); color:var(--son) !important;
+  padding:.45rem .95rem !important; border-radius:3px;
+  position:relative; overflow:hidden; isolation:isolate;
+  transition:color .4s var(--ease);
+}
+.nav__cta::before{
+  content:""; position:absolute; inset:0; background:var(--son); z-index:-1;
+  transform:scaleX(0); transform-origin:right; transition:transform .45s var(--ease);
+}
+.nav__cta:hover::before{ transform:scaleX(1); transform-origin:left; }
+.nav__cta:hover{ color:var(--lua) !important; }
+.nav__cta::after{ display:none !important; }
 @media(max-width:760px){ .nav__links a.opt{ display:none; } }
 
 /* ── sân khấu mở đầu ──────────────────────────────────── */
@@ -244,17 +260,6 @@ html.no-stage .stage__inner{ height:auto; min-height:100svh; }
 .shead h2 i{ font-style:italic; color:var(--accent); }
 .shead__n{ font-family:var(--mono); font-size:.66rem; letter-spacing:.26em;
   text-transform:uppercase; color:var(--fg-faint); }
-
-/* ── tâm pháp ─────────────────────────────────────────── */
-.manifesto{ padding-block:clamp(5rem,14vh,10rem); }
-.manifesto p{
-  font-family:var(--serif); font-weight:300;
-  font-size:clamp(1.5rem,3.6vw,2.9rem);
-  line-height:1.42; letter-spacing:-.015em; margin:0 0 1.3rem; max-width:22ch;
-  text-wrap:balance;
-}
-.manifesto p.off{ margin-left:auto; text-align:right; max-width:20ch; }
-.manifesto .mk-t{ color:var(--nghe-s); font-style:italic; }
 
 /* hiện từng từ */
 .rv-w{ display:inline-block; overflow:hidden; vertical-align:top;

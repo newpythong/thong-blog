@@ -3,20 +3,21 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Nghiên mực — Soạn thảo</title>
+<title>Viết bài — Mực</title>
 <meta name="robots" content="noindex, nofollow">
 <meta name="theme-color" content="#f7efdb">
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' fill='%23f7efdb'/%3E%3Cpath d='M6 76 L34 34 L50 58 L64 26 L94 76 Z' fill='%23b4441f'/%3E%3C/svg%3E">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,200..600;1,6..72,200..500&family=Be+Vietnam+Pro:ital,wght@0,300;0,400;0,500;0,600;1,400&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link href="https://cdn.jsdelivr.net/npm/quill@2.0.3/dist/quill.snow.css" rel="stylesheet">
 <link rel="stylesheet" href="assets/css/main.css">
+<link rel="stylesheet" href="assets/css/editor.css">
 </head>
 <body>
 
 <canvas class="petals" data-density="0.28" data-alpha="0.5" aria-hidden="true"></canvas>
 <canvas class="ripples" aria-hidden="true"></canvas>
-
 <div class="grain"></div>
 
 <nav class="nav">
@@ -30,416 +31,139 @@
   </div>
 </nav>
 
-<!-- ═══ GATE ═══ -->
-<section class="gate" id="gate">
+<!-- ═══════════ ĐĂNG NHẬP ═══════════ -->
+<section class="gate" id="gate" hidden>
   <div class="gate__box">
     <div class="eyebrow">Cửa vào</div>
-    <h1>Mài mực</h1>
-    <p>Đăng nhập bằng GitHub token của chính bạn. Token chỉ nằm trong trình duyệt này, không gửi đi đâu ngoài github.com.</p>
+    <h1>Đăng nhập</h1>
+    <p>Nhập tên đăng nhập và mật khẩu của bạn để vào viết bài.</p>
 
-    <div class="msg" id="gateMsg"></div>
+    <div class="msg" id="loginMsg"></div>
 
-    <form id="gateForm">
+    <form id="loginForm">
       <div class="field">
-        <label for="tok">GitHub Personal Access Token</label>
-        <input class="inp" id="tok" type="password" autocomplete="current-password"
-               placeholder="github_pat_… hoặc ghp_…" required>
+        <label for="lu">Tên đăng nhập</label>
+        <input class="inp" id="lu" autocomplete="username" autocapitalize="off" spellcheck="false" required>
       </div>
       <div class="field">
-        <label class="chk"><input type="checkbox" id="remember" checked> Ghi nhớ trên máy này</label>
+        <label for="lp">Mật khẩu</label>
+        <input class="inp" id="lp" type="password" autocomplete="current-password" required>
       </div>
-      <button class="btn btn--go" type="submit" id="gateBtn"><span>Vào nghiên</span></button>
+      <label class="chk"><input type="checkbox" id="lr" checked> Giữ đăng nhập trên máy này</label>
+      <div style="margin-top:1.3rem">
+        <button class="btn btn--go" type="submit" id="loginBtn"><span>Vào viết</span></button>
+      </div>
+    </form>
+
+    <div class="note" id="gateNote"></div>
+  </div>
+</section>
+
+<!-- ═══════════ CÀI ĐẶT LẦN ĐẦU ═══════════ -->
+<section class="gate" id="setup" hidden>
+  <div class="gate__box gate__box--wide">
+    <div class="eyebrow">Cài đặt lần đầu</div>
+    <h1>Tạo tài khoản</h1>
+    <p>Blog này không có máy chủ, nên tài khoản của bạn được khoá bằng chính mật khẩu bạn đặt.
+       Chỉ phải làm một lần — sau đó mọi thiết bị đều đăng nhập được bằng tên và mật khẩu.</p>
+
+    <div class="msg" id="setupMsg"></div>
+
+    <form id="setupForm">
+      <div class="field">
+        <label for="st">1 · Token GitHub <span class="hint">(dán một lần rồi quên đi)</span></label>
+        <input class="inp" id="st" type="password" placeholder="github_pat_…" required>
+        <div class="help">
+          Chưa có? <a href="https://github.com/settings/personal-access-tokens/new" target="_blank" rel="noopener">Tạo tại đây</a> —
+          Repository access → <b>Only select repositories</b> → <b id="repoName">…</b>,
+          rồi Permissions → Repository permissions → <b class="hot">Contents: Read and write</b>.
+        </div>
+      </div>
+
+      <div class="ed__two">
+        <div class="field">
+          <label for="su">2 · Tên đăng nhập</label>
+          <input class="inp" id="su" autocapitalize="off" spellcheck="false" required>
+        </div>
+        <div class="field">
+          <label for="sp">3 · Mật khẩu</label>
+          <div class="inp-row">
+            <input class="inp" id="sp" type="text" spellcheck="false" required>
+            <button class="btn btn--sm" type="button" id="genPass"><span>Đổi</span></button>
+          </div>
+        </div>
+      </div>
+      <div class="help">Lưu mật khẩu này vào trình quản lý mật khẩu. Mất mật khẩu là phải cài lại từ đầu.</div>
+
+      <div style="margin-top:1.5rem">
+        <button class="btn btn--go" type="submit" id="setupBtn"><span>Tạo tài khoản</span></button>
+      </div>
     </form>
 
     <div class="note">
-      Tạo token: <a href="https://github.com/settings/personal-access-tokens/new" target="_blank" rel="noopener">Fine-grained token</a><br>
-      · Repository access → Only select repositories → <b id="repoName">…</b><br>
-      · Permissions → Repository permissions → <b>Contents: Read and write</b><br>
-      Chỉ cần đúng một quyền đó. Không cấp thêm gì khác.
+      Token được mã hoá bằng mật khẩu của bạn trước khi lưu vào kho.
+      Kho này công khai, nên gói mã hoá ai cũng tải về được — đó là lý do mật khẩu phải dài.
+      Token chỉ có quyền ghi nội dung đúng kho này.
     </div>
   </div>
 </section>
 
-<!-- ═══ EDITOR ═══ -->
-<section class="ed wrap" id="ed" hidden>
-  <div class="ed__bar">
-    <div>
-      <div class="eyebrow" style="margin-bottom:.4rem">Soạn thảo &nbsp;·&nbsp; <span id="who">…</span></div>
-      <div class="shead__n" id="mode">Bài mới</div>
+<!-- ═══════════ SOẠN THẢO ═══════════ -->
+<section class="ed" id="ed" hidden>
+  <div class="wrap">
+
+    <div class="ed__bar">
+      <div>
+        <div class="eyebrow" style="margin-bottom:.35rem">Đang viết &nbsp;·&nbsp; <span id="who">…</span></div>
+        <div class="shead__n" id="mode">Bài mới</div>
+      </div>
+      <div class="ed__actions">
+        <button class="btn btn--sm" id="newBtn"><span>Bài mới</span></button>
+        <button class="btn btn--sm" id="listBtn"><span>Bài đã đăng</span></button>
+        <button class="btn btn--go" id="pubBtn" data-mag><span>Đăng bài</span></button>
+      </div>
     </div>
-    <div style="display:flex;gap:.7rem;flex-wrap:wrap">
-      <button class="btn" id="newBtn"><span>Bài mới</span></button>
-      <button class="btn btn--go" id="pubBtn" data-mag><span>Đăng lên prod</span></button>
+
+    <div class="msg" id="edMsg"></div>
+
+    <div class="ed__paper">
+      <input class="ed__title" id="f-title" placeholder="Tiêu đề bài viết…">
+      <input class="ed__dek" id="f-excerpt" placeholder="Một câu dẫn nhập ngắn, hiện ở trang chủ…">
+
+      <div class="ed__meta">
+        <label>Thẻ <input class="inp inp--xs" id="f-tag" placeholder="Chiêm nghiệm"></label>
+        <label>Ngày <input class="inp inp--xs" id="f-date" type="date"></label>
+        <label>Đường dẫn <input class="inp inp--xs inp--slug" id="f-slug" placeholder="tu-dong"></label>
+        <label class="chk"><input type="checkbox" id="f-draft"> Lưu nháp</label>
+      </div>
+
+      <div id="editor"></div>
+      <input type="file" id="imgPick" accept="image/*" hidden>
     </div>
-  </div>
 
-  <div class="msg" id="edMsg"></div>
+    <div class="ed__foot">
+      <span id="wc">0 chữ</span>
+      <span>Ảnh: bấm biểu tượng ảnh trên thanh công cụ · Lưu nhanh: ⌘S</span>
+    </div>
 
-  <div class="ed__grid">
-    <div>
-      <div class="field">
-        <label for="f-title">Tiêu đề</label>
-        <input class="inp" id="f-title" placeholder="Tĩnh tại giữa nhiễu động">
-      </div>
-      <div class="ed__two">
-        <div class="field">
-          <label for="f-slug">Đường dẫn (slug)</label>
-          <input class="inp" id="f-slug" placeholder="tinh-tai-giua-nhieu-dong">
-        </div>
-        <div class="field">
-          <label for="f-tag">Thẻ</label>
-          <input class="inp" id="f-tag" placeholder="Chiêm nghiệm">
-        </div>
-      </div>
-      <div class="ed__two">
-        <div class="field">
-          <label for="f-date">Ngày</label>
-          <input class="inp" id="f-date" type="date">
-        </div>
-        <div class="field">
-          <label class="chk" style="margin-top:1.75rem"><input type="checkbox" id="f-draft"> Nháp (ẩn khỏi trang chủ)</label>
-        </div>
-      </div>
-      <div class="field">
-        <label for="f-excerpt">Dẫn nhập ngắn</label>
-        <input class="inp" id="f-excerpt" placeholder="Một câu đủ để người ta dừng lại.">
-      </div>
-      <div class="field">
-        <label for="f-body">Nội dung — Markdown</label>
-        <textarea class="inp" id="f-body" rows="24" spellcheck="false"
-placeholder="Viết ở đây.
-
-## Một tiêu đề phụ
-
-Đoạn văn bình thường. **Đậm**, *nghiêng*, `mã`, [liên kết](https://…).
-
-> Một câu đáng để lặng đi vài giây.
-
-- gạch đầu dòng
-- gạch nữa
-
-```js
-const im_lang = true;
-```"></textarea>
-      </div>
-
-      <div class="shead__n" style="margin-top:2rem">Đã có trên prod</div>
+    <!-- danh sách bài -->
+    <div class="ed__list" id="listPane" hidden>
+      <div class="shead__n" style="margin-bottom:1rem">Bài đã đăng</div>
       <div class="mine" id="mine"></div>
     </div>
 
-    <aside class="preview">
-      <div class="shead__n" style="margin-bottom:1.2rem">Xem trước</div>
-      <div class="prose" id="pv"><p style="color:var(--fg-faint)">Chưa có gì.</p></div>
-    </aside>
   </div>
 </section>
 
+<script src="https://cdn.jsdelivr.net/npm/quill@2.0.3/dist/quill.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.15.0/gsap.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.15.0/ScrollTrigger.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/lenis@1.3.26/dist/lenis.min.js"></script>
 <script>if(window.gsap&&window.ScrollTrigger)document.documentElement.classList.add('gsap');</script>
 <script src="assets/js/core.js"></script>
+<script src="assets/js/auth.js"></script>
+<script src="assets/js/htmlmd.js"></script>
 <script src="assets/js/scene.js"></script>
 <script src="assets/js/motion.js"></script>
-<script>
-(() => {
-  const S = window.SUMI, C = S.CFG;
-  const $ = id => document.getElementById(id);
-  const KEY = 'sumi.tok';
-  const API = 'https://api.github.com';
-  let token = null, shaCache = {}, editing = null;
-
-  $('repoName').textContent = C.owner + '/' + C.repo;
-
-  const say = (el, txt, kind) => {
-    el.textContent = txt;
-    el.className = 'msg on msg--' + (kind || 'ok');
-    if (kind === 'ok') setTimeout(() => { el.className = 'msg'; }, 6000);
-  };
-  const hide = el => { el.className = 'msg'; };
-
-  /* ---- github ---- */
-  const b64 = str => {
-    const bytes = new TextEncoder().encode(str);
-    let bin = '';
-    bytes.forEach(b => bin += String.fromCharCode(b));
-    return btoa(bin);
-  };
-  const unb64 = s => new TextDecoder().decode(
-    Uint8Array.from(atob(s.replace(/\s/g, '')), c => c.charCodeAt(0)));
-
-  async function gh(path, opts = {}) {
-    const r = await fetch(API + path, {
-      ...opts,
-      headers: {
-        'Accept': 'application/vnd.github+json',
-        'X-GitHub-Api-Version': '2022-11-28',
-        'Authorization': 'Bearer ' + token,
-        ...(opts.body ? { 'Content-Type': 'application/json' } : {}),
-        ...(opts.headers || {})
-      }
-    });
-    if (r.status === 204) return null;
-    const j = await r.json().catch(() => ({}));
-    if (!r.ok) {
-      const e = new Error(j.message || ('HTTP ' + r.status));
-      e.status = r.status; e.body = j;
-      throw e;
-    }
-    return j;
-  }
-
-  const contentPath = p => '/repos/' + C.owner + '/' + C.repo + '/contents/' + p;
-
-  async function getFile(path) {
-    try {
-      const j = await gh(contentPath(path) + '?ref=' + C.branch);
-      shaCache[path] = j.sha;
-      return unb64(j.content || '');
-    } catch (e) {
-      if (e.status === 404) { delete shaCache[path]; return null; }
-      throw e;
-    }
-  }
-
-  async function putFile(path, text, message) {
-    const body = {
-      message, content: b64(text), branch: C.branch,
-      ...(shaCache[path] ? { sha: shaCache[path] } : {})
-    };
-    const j = await gh(contentPath(path), { method: 'PUT', body: JSON.stringify(body) });
-    shaCache[path] = j.content.sha;
-    return j;
-  }
-
-  async function delFile(path, message) {
-    if (!shaCache[path]) await getFile(path);
-    if (!shaCache[path]) return;
-    await gh(contentPath(path), {
-      method: 'DELETE',
-      body: JSON.stringify({ message, sha: shaCache[path], branch: C.branch })
-    });
-    delete shaCache[path];
-  }
-
-  /* ---- gate ---- */
-  async function enter(tok) {
-    token = tok;
-    const me = await gh('/user');
-    await gh('/repos/' + C.owner + '/' + C.repo);
-    $('who').textContent = me.login;
-    $('gate').hidden = true;
-    $('ed').hidden = false;
-    $('logout').hidden = false;
-    document.title = 'Nghiên mực — ' + me.login;
-    await refreshMine();
-    blank();
-  }
-
-  $('gateForm').addEventListener('submit', async e => {
-    e.preventDefault();
-    const tok = $('tok').value.trim();
-    if (!tok) return;
-    $('gateBtn').disabled = true;
-    hide($('gateMsg'));
-    try {
-      await enter(tok);
-      if ($('remember').checked) localStorage.setItem(KEY, tok);
-      else sessionStorage.setItem(KEY, tok);
-    } catch (err) {
-      token = null;
-      say($('gateMsg'),
-        err.status === 401 ? 'Token không hợp lệ hoặc đã hết hạn.'
-        : err.status === 404 ? 'Token hợp lệ nhưng không thấy repo ' + C.owner + '/' + C.repo + ' — kiểm tra phần Repository access.'
-        : 'Lỗi: ' + err.message, 'err');
-    } finally {
-      $('gateBtn').disabled = false;
-    }
-  });
-
-  $('logout').addEventListener('click', e => {
-    e.preventDefault();
-    localStorage.removeItem(KEY); sessionStorage.removeItem(KEY);
-    location.reload();
-  });
-
-  /* ---- editor ---- */
-  const F = {
-    title: $('f-title'), slug: $('f-slug'), tag: $('f-tag'),
-    date: $('f-date'), excerpt: $('f-excerpt'), body: $('f-body'), draft: $('f-draft')
-  };
-
-  const render = () => {
-    const html = S.md(F.body.value);
-    $('pv').innerHTML = (F.title.value ? '<h2>' + S.esc(F.title.value) + '</h2>' : '') +
-      (html || '<p style="color:var(--fg-faint)">Chưa có gì.</p>');
-  };
-  Object.values(F).forEach(el => el.addEventListener('input', render));
-
-  let slugTouched = false;
-  F.slug.addEventListener('input', () => { slugTouched = true; });
-  F.title.addEventListener('input', () => {
-    if (!slugTouched && !editing) F.slug.value = S.slugify(F.title.value);
-  });
-
-  function blank() {
-    editing = null; slugTouched = false;
-    F.title.value = ''; F.slug.value = ''; F.tag.value = '';
-    F.excerpt.value = ''; F.body.value = ''; F.draft.checked = false;
-    F.date.value = new Date().toISOString().slice(0, 10);
-    $('mode').textContent = 'Bài mới';
-    render();
-  }
-  $('newBtn').addEventListener('click', blank);
-
-  /* tab inserts two spaces */
-  F.body.addEventListener('keydown', e => {
-    if (e.key === 'Tab') {
-      e.preventDefault();
-      const s = F.body.selectionStart, en = F.body.selectionEnd;
-      F.body.value = F.body.value.slice(0, s) + '  ' + F.body.value.slice(en);
-      F.body.selectionStart = F.body.selectionEnd = s + 2;
-      render();
-    }
-  });
-
-  /* ---- index + publish ---- */
-  async function readIndex() {
-    const txt = await getFile(C.index);
-    if (!txt) return [];
-    try { const j = JSON.parse(txt); return Array.isArray(j) ? j : (j.posts || []); }
-    catch (e) { return []; }
-  }
-
-  async function refreshMine() {
-    const posts = await readIndex();
-    const box = $('mine');
-    if (!posts.length) {
-      box.innerHTML = '<div class="mine__i" style="justify-content:center;color:var(--fg-faint)">Chưa có bài nào</div>';
-      return;
-    }
-    posts.sort((a, b) => String(b.date || '').localeCompare(String(a.date || '')));
-    box.innerHTML = posts.map(p => `
-      <div class="mine__i">
-        <div>
-          <div>${S.esc(p.title || p.slug)}${p.draft ? ' <small style="color:var(--dat)">nháp</small>' : ''}</div>
-          <small>${S.esc(S.fmtDate(p.date))} · ${S.esc(p.slug)}</small>
-        </div>
-        <div style="display:flex;gap:1rem;white-space:nowrap">
-          <a class="lnk" href="#" data-edit="${S.esc(p.slug)}">Sửa</a>
-          <a class="lnk" href="post.html?p=${encodeURIComponent(p.slug)}" target="_blank">Xem</a>
-          <a class="lnk" href="#" data-del="${S.esc(p.slug)}" style="color:var(--son)">Xoá</a>
-        </div>
-      </div>`).join('');
-
-    box.querySelectorAll('[data-edit]').forEach(a =>
-      a.addEventListener('click', async e => {
-        e.preventDefault();
-        await loadForEdit(a.dataset.edit, posts);
-      }));
-    box.querySelectorAll('[data-del]').forEach(a =>
-      a.addEventListener('click', async e => {
-        e.preventDefault();
-        const slug = a.dataset.del;
-        if (!confirm('Xoá vĩnh viễn bài "' + slug + '" khỏi prod?')) return;
-        try {
-          await delFile(C.dir + '/' + slug + '.md', 'sumi: xoá ' + slug);
-          const idx = (await readIndex()).filter(p => p.slug !== slug);
-          await putFile(C.index, JSON.stringify(idx, null, 2) + '\n', 'sumi: cập nhật mục lục');
-          if (editing === slug) blank();
-          await refreshMine();
-          say($('edMsg'), 'Đã xoá "' + slug + '".', 'ok');
-        } catch (err) { say($('edMsg'), 'Lỗi xoá: ' + err.message, 'err'); }
-      }));
-  }
-
-  async function loadForEdit(slug, posts) {
-    try {
-      const meta = posts.find(p => p.slug === slug) || {};
-      const txt = await getFile(C.dir + '/' + slug + '.md');
-      editing = slug; slugTouched = true;
-      F.title.value = meta.title || '';
-      F.slug.value = slug;
-      F.tag.value = meta.tag || '';
-      F.excerpt.value = meta.excerpt || '';
-      F.date.value = (meta.date || '').slice(0, 10);
-      F.draft.checked = !!meta.draft;
-      F.body.value = (txt || '').replace(/^\s*#\s+.*\n+/, '');
-      $('mode').textContent = 'Đang sửa: ' + slug;
-      render();
-      scrollTo({ top: 0, behavior: 'smooth' });
-    } catch (err) { say($('edMsg'), 'Không mở được: ' + err.message, 'err'); }
-  }
-
-  $('pubBtn').addEventListener('click', async () => {
-    const title = F.title.value.trim();
-    const body = F.body.value.trim();
-    if (!title) return say($('edMsg'), 'Cần một tiêu đề.', 'err');
-    if (!body) return say($('edMsg'), 'Cần nội dung.', 'err');
-
-    let slug = S.slugify(F.slug.value.trim() || title);
-    F.slug.value = slug;
-
-    $('pubBtn').disabled = true;
-    say($('edMsg'), 'Đang gửi mực lên prod…', 'ok');
-
-    try {
-      const idx = await readIndex();
-
-      if (!editing && idx.some(p => p.slug === slug)) {
-        slug = slug + '-' + Date.now().toString(36).slice(-4);
-        F.slug.value = slug;
-      }
-      // renaming an existing post: drop the old file
-      if (editing && editing !== slug) {
-        await delFile(C.dir + '/' + editing + '.md', 'sumi: đổi tên ' + editing);
-      }
-
-      const path = C.dir + '/' + slug + '.md';
-      if (!(path in shaCache)) await getFile(path);
-      await putFile(path, '# ' + title + '\n\n' + body + '\n',
-        'sumi: ' + (editing ? 'sửa' : 'viết') + ' "' + title + '"');
-
-      const entry = {
-        slug,
-        title,
-        date: F.date.value || new Date().toISOString().slice(0, 10),
-        tag: F.tag.value.trim(),
-        excerpt: F.excerpt.value.trim() || body.replace(/[#>*`_-]/g, '').slice(0, 150).trim(),
-        draft: F.draft.checked
-      };
-      const next = idx.filter(p => p.slug !== slug && p.slug !== editing);
-      next.push(entry);
-      next.sort((a, b) => String(b.date || '').localeCompare(String(a.date || '')));
-      await putFile(C.index, JSON.stringify(next, null, 2) + '\n', 'sumi: cập nhật mục lục');
-
-      editing = slug;
-      $('mode').textContent = 'Đang sửa: ' + slug;
-      await refreshMine();
-      say($('edMsg'),
-        'Xong. GitHub Pages build khoảng 30–60 giây rồi bài sẽ hiện ở trang chủ.', 'ok');
-    } catch (err) {
-      say($('edMsg'),
-        err.status === 409 ? 'Xung đột phiên bản — thử lại lần nữa.' : 'Lỗi: ' + err.message, 'err');
-    } finally {
-      $('pubBtn').disabled = false;
-    }
-  });
-
-  /* ctrl/cmd + s */
-  addEventListener('keydown', e => {
-    if ((e.metaKey || e.ctrlKey) && e.key === 's' && !$('ed').hidden) {
-      e.preventDefault(); $('pubBtn').click();
-    }
-  });
-
-  /* ---- auto login ---- */
-  const saved = localStorage.getItem(KEY) || sessionStorage.getItem(KEY);
-  if (saved) enter(saved).catch(() => {
-    localStorage.removeItem(KEY); sessionStorage.removeItem(KEY);
-    say($('gateMsg'), 'Phiên cũ đã hết hạn. Đăng nhập lại.', 'err');
-  });
-})();
-</script>
+<script src="assets/js/editor.js"></script>
 </body>
 </html>

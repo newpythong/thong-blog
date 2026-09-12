@@ -12,7 +12,7 @@
 
   let token = null, sha = {}, editing = null, quill = null, me = '';
 
-  const BUILD = '260912c';          // đổi mỗi lần sửa, để biết trình duyệt đang chạy bản nào
+  const BUILD = '260912d';          // đổi mỗi lần sửa, để biết trình duyệt đang chạy bản nào
 
   $('repoName').textContent = C.owner + '/' + C.repo;
   if ($('ver')) $('ver').textContent = 'bản ' + BUILD;
@@ -38,6 +38,10 @@
   async function gh(path, opts = {}, tok) {
     const r = await fetch(API + path, {
       ...opts,
+      /* GitHub trả cache-control: private, max-age=60 cho lời gọi có token.
+         Để mặc định thì trình duyệt phục vụ lại bản cũ trong một phút, và
+         ta đọc mục lục cũ rồi ghi đè lên mục lục mới. */
+      cache: 'no-store',
       headers: {
         'Accept': 'application/vnd.github+json',
         'X-GitHub-Api-Version': '2022-11-28',
@@ -186,6 +190,7 @@
   /* Đọc thử mục lục: cần đúng quyền Contents mà ta yêu cầu, không hơn. */
   async function checkToken(tok) {
     const r = await fetch(API + cpath(C.index) + '?ref=' + C.branch, {
+      cache: 'no-store',
       headers: {
         'Accept': 'application/vnd.github+json',
         'X-GitHub-Api-Version': '2022-11-28',
@@ -295,6 +300,17 @@
     if (!pane.hidden) pane.scrollIntoView({ behavior: 'smooth', block: 'start' });
   });
 
+  /* ══════════ HÀNG ĐỢI GHI ══════════
+     Xoá và đăng đều là chuỗi nhiều bước: đọc mục lục → sửa → ghi lại. Hai
+     chuỗi chạy chồng nhau thì chuỗi sau đọc mục lục trước khi chuỗi trước kịp
+     ghi, rồi ghi đè mất việc của nhau. Xếp hàng để mỗi lúc chỉ một chuỗi chạy. */
+  let queue = Promise.resolve();
+  function serial(fn) {
+    const run = queue.then(fn, fn);
+    queue = run.catch(() => {});
+    return run;
+  }
+
   /* ══════════ MỤC LỤC ══════════ */
   async function readIndex() {
     const txt = await getFile(C.index);
@@ -330,18 +346,23 @@
     box.querySelectorAll('[data-edit]').forEach(a =>
       a.addEventListener('click', async e => { e.preventDefault(); await load(a.dataset.edit, posts); }));
     box.querySelectorAll('[data-del]').forEach(a =>
-      a.addEventListener('click', async e => {
+      a.addEventListener('click', e => {
         e.preventDefault();
         const slug = a.dataset.del;
         if (!confirm('Xoá vĩnh viễn bài "' + slug + '"?')) return;
-        try {
-          await delFile(C.dir + '/' + slug + '.md', 'muc: xoá ' + slug);
-          const idx = posts.filter(x => x.slug !== slug);
-          await putFile(C.index, JSON.stringify(idx, null, 2) + '\n', 'muc: cập nhật mục lục');
-          if (editing === slug) blank();
-          renderList(idx);
-          say($('edMsg'), 'Đã xoá.', 'ok');
-        } catch (err) { say($('edMsg'), 'Lỗi xoá: ' + err.message, 'err'); }
+        say($('edMsg'), 'Đang xoá…', 'ok');
+        serial(async () => {
+          try {
+            await delFile(C.dir + '/' + slug + '.md', 'muc: xoá ' + slug);
+            /* đọc lại tại đây, không dùng mảng dựng lúc trước: bài khác có thể
+               vừa bị xoá hoặc vừa được đăng kể từ lúc danh sách được dựng */
+            const idx = (await readIndex()).filter(x => x.slug !== slug);
+            await putFile(C.index, JSON.stringify(idx, null, 2) + '\n', 'muc: cập nhật mục lục');
+            if (editing === slug) blank();
+            renderList(idx);
+            say($('edMsg'), 'Đã xoá.', 'ok');
+          } catch (err) { say($('edMsg'), 'Lỗi xoá: ' + err.message, 'err'); }
+        });
       }));
   }
 
@@ -366,10 +387,10 @@
   }
 
   /* ══════════ ĐĂNG ══════════ */
-  $('pubBtn').addEventListener('click', publish);
+  $('pubBtn').addEventListener('click', () => serial(publish));
   addEventListener('keydown', e => {
     if ((e.metaKey || e.ctrlKey) && e.key === 's' && !$('ed').hidden) {
-      e.preventDefault(); publish();
+      e.preventDefault(); serial(publish);
     }
   });
 

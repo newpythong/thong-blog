@@ -1,11 +1,11 @@
 [
   {
-    "slug": "vet-nut-va-vang-rong",
-    "title": "Vết nứt và vàng ròng",
-    "date": "2026-09-06",
-    "tag": "Chiêm nghiệm",
-    "excerpt": "Người ta hàn gốm vỡ bằng vàng, để vết nứt sáng lên. Còn chúng ta thì nén cả bản thân mình.",
-    "draft": false
+    "slug": "kiem-thu-tu-dong-xoa-sau",
+    "title": "Kiểm thử tự động — sẽ xoá",
+    "date": "2026-09-12",
+    "tag": "",
+    "excerpt": "Bài do máy tạo để kiểm tra, sẽ bị xoá ngay sau đó.",
+    "draft": true
   },
   {
     "slug": "tinh-tai-giua-nhieu-dong",
@@ -13,6 +13,14 @@
     "date": "2026-09-08",
     "tag": "Thiền",
     "excerpt": "Máy tính không hiểu khoảng trống. Nó gọi đó là idle — trạng thái lãng phí cần tối ưu.",
+    "draft": false
+  },
+  {
+    "slug": "vet-nut-va-vang-rong",
+    "title": "Vết nứt và vàng ròng",
+    "date": "2026-09-06",
+    "tag": "Chiêm nghiệm",
+    "excerpt": "Người ta hàn gốm vỡ bằng vàng, để vết nứt sáng lên. Còn chúng ta thì nén cả bản thân mình.",
     "draft": false
   }
 ]

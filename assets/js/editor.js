@@ -12,7 +12,7 @@
 
   let token = null, sha = {}, editing = null, quill = null, me = '';
 
-  const BUILD = '260912b';          // đổi mỗi lần sửa, để biết trình duyệt đang chạy bản nào
+  const BUILD = '260912c';          // đổi mỗi lần sửa, để biết trình duyệt đang chạy bản nào
 
   $('repoName').textContent = C.owner + '/' + C.repo;
   if ($('ver')) $('ver').textContent = 'bản ' + BUILD;
@@ -165,13 +165,15 @@
         err.status === 401
           ? 'Token không hợp lệ hoặc đã hết hạn. Tạo token mới rồi dán lại.'
         : perm && readOK
-          /* đọc được mà ghi không được: gần như luôn là Contents để "Read-only",
-             hoặc Repository access chọn "Public repositories" (vốn chỉ đọc) */
-          ? 'Token đọc được kho ' + R + ' nhưng không ghi được. Trên trang token, '
-            + 'Repository access phải là "Only select repositories" có chọn ' + R + ' '
-            + '(đừng chọn "Public repositories" — mục đó chỉ cho đọc), và '
-            + 'Permissions → Repository permissions → Contents phải là "Read and write" '
-            + '(không phải "Read-only"). Sửa xong bấm Update token rồi dán lại token cũ.'
+          /* Đọc được nhưng ghi không được. Lưu ý: kho công khai nên quyền đọc
+             không chứng minh token đã trỏ đúng kho — "Public repositories"
+             cũng đọc được. Nên phải soát cả ba ô, kể cả Resource owner. */
+          ? 'Token này không ghi được vào kho ' + R + '. Mở lại trang token trên GitHub '
+            + 'và soát đủ ba ô: (1) Resource owner phải là newpythong — không phải một tổ chức; '
+            + '(2) Repository access phải là "Only select repositories" và có chọn ' + R + ' '
+            + '— nếu đang để "Public repositories" thì chỉ đọc được, không ghi được; '
+            + '(3) Permissions → Repository permissions → Contents phải là "Read and write". '
+            + 'Riêng ô Resource owner không sửa được trên token cũ — nếu ô đó sai thì phải tạo token mới.'
         : perm
           ? 'Token chưa đủ quyền cho kho ' + R + '. Mở lại trang token trên GitHub và kiểm tra hai chỗ: '
             + '(1) Repository access phải là "Only select repositories" và có chọn ' + R + '; '

@@ -140,8 +140,10 @@
     btn.disabled = true;
     say($('setupMsg'), 'Đang kiểm tra token và tạo tài khoản…', 'ok');
     try {
-      await gh('/user', {}, tok);
-      await gh('/repos/' + C.owner + '/' + C.repo, {}, tok);
+      /* Chỉ thử đúng thao tác mình cần. Fine-grained token chỉ có quyền
+         Contents trên một kho thì không vào được /user hay /repos/{o}/{r},
+         gọi vào đó sẽ báo "Resource not accessible by personal access token". */
+      await checkToken(tok);
 
       const rec = await A.seal(tok, user, pass);
       await getFile(AUTH_PATH, tok);                       // lấy sha nếu đã có
@@ -152,18 +154,40 @@
       await enter(tok, user);
       localStorage.setItem(SESSION, tok);
     } catch (err) {
+      const R = C.owner + '/' + C.repo;
       say($('setupMsg'),
-        err.status === 401 ? 'Token không hợp lệ hoặc đã hết hạn.'
-        : err.status === 404 ? 'Token hợp lệ nhưng không thấy kho ' + C.owner + '/' + C.repo + ' — kiểm tra phần Repository access.'
+        err.status === 401
+          ? 'Token không hợp lệ hoặc đã hết hạn. Tạo token mới rồi dán lại.'
+        : (err.status === 403 || err.status === 404)
+          ? 'Token chưa đủ quyền cho kho ' + R + '. Mở lại trang token trên GitHub và kiểm tra hai chỗ: '
+            + '(1) Repository access phải là "Only select repositories" và có chọn ' + R + '; '
+            + '(2) Permissions → Repository permissions → Contents phải là "Read and write". '
+            + 'Sửa xong bấm Update token rồi dán lại token cũ — không cần tạo token mới.'
         : 'Lỗi: ' + err.message, 'err');
     } finally { btn.disabled = false; }
   });
 
+  /* Đọc thử mục lục: cần đúng quyền Contents mà ta yêu cầu, không hơn. */
+  async function checkToken(tok) {
+    const r = await fetch(API + cpath(C.index) + '?ref=' + C.branch, {
+      headers: {
+        'Accept': 'application/vnd.github+json',
+        'X-GitHub-Api-Version': '2022-11-28',
+        'Authorization': 'Bearer ' + tok
+      }
+    });
+    if (r.ok || r.status === 404) return;        // 404 = kho chưa có mục lục, vẫn hợp lệ
+    const j = await r.json().catch(() => ({}));
+    const e = new Error(j.message || 'HTTP ' + r.status);
+    e.status = r.status;
+    throw e;
+  }
+
   /* ══════════ VÀO SOẠN THẢO ══════════ */
   async function enter(tok, user) {
+    await checkToken(tok);          // token cũ hết hạn thì chặn ngay ở cửa
     token = tok;
-    const u = await gh('/user');
-    me = user || u.login;
+    me = user || 'bạn';
     $('who').textContent = me;
     document.title = 'Viết bài — ' + me;
     show('ed');

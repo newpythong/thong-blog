@@ -12,7 +12,10 @@
 
   let token = null, sha = {}, editing = null, quill = null, me = '';
 
+  const BUILD = '260912b';          // đổi mỗi lần sửa, để biết trình duyệt đang chạy bản nào
+
   $('repoName').textContent = C.owner + '/' + C.repo;
+  if ($('ver')) $('ver').textContent = 'bản ' + BUILD;
 
   /* ── thông báo ───────────────────────────── */
   const say = (el, txt, kind) => {
@@ -139,11 +142,13 @@
 
     btn.disabled = true;
     say($('setupMsg'), 'Đang kiểm tra token và tạo tài khoản…', 'ok');
+    let readOK = false;
     try {
       /* Chỉ thử đúng thao tác mình cần. Fine-grained token chỉ có quyền
          Contents trên một kho thì không vào được /user hay /repos/{o}/{r},
          gọi vào đó sẽ báo "Resource not accessible by personal access token". */
       await checkToken(tok);
+      readOK = true;                 // đọc được rồi; lỗi sau đây là lỗi quyền ghi
 
       const rec = await A.seal(tok, user, pass);
       await getFile(AUTH_PATH, tok);                       // lấy sha nếu đã có
@@ -155,10 +160,19 @@
       localStorage.setItem(SESSION, tok);
     } catch (err) {
       const R = C.owner + '/' + C.repo;
+      const perm = err.status === 403 || err.status === 404;
       say($('setupMsg'),
         err.status === 401
           ? 'Token không hợp lệ hoặc đã hết hạn. Tạo token mới rồi dán lại.'
-        : (err.status === 403 || err.status === 404)
+        : perm && readOK
+          /* đọc được mà ghi không được: gần như luôn là Contents để "Read-only",
+             hoặc Repository access chọn "Public repositories" (vốn chỉ đọc) */
+          ? 'Token đọc được kho ' + R + ' nhưng không ghi được. Trên trang token, '
+            + 'Repository access phải là "Only select repositories" có chọn ' + R + ' '
+            + '(đừng chọn "Public repositories" — mục đó chỉ cho đọc), và '
+            + 'Permissions → Repository permissions → Contents phải là "Read and write" '
+            + '(không phải "Read-only"). Sửa xong bấm Update token rồi dán lại token cũ.'
+        : perm
           ? 'Token chưa đủ quyền cho kho ' + R + '. Mở lại trang token trên GitHub và kiểm tra hai chỗ: '
             + '(1) Repository access phải là "Only select repositories" và có chọn ' + R + '; '
             + '(2) Permissions → Repository permissions → Contents phải là "Read and write". '

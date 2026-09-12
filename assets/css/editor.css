@@ -140,3 +140,7 @@
 .ql-container:focus-within{ outline:none !important; }
 .ed__title:focus-visible,
 .ed__dek:focus-visible{ outline:none; box-shadow:0 2px 0 var(--son); }
+
+/* dấu bản dựng — để biết trình duyệt đang chạy tệp mới hay tệp trong bộ nhớ đệm */
+.ver{ display:block; margin-top:.6rem; font-family:var(--mono); font-size:.58rem;
+  letter-spacing:.14em; text-transform:uppercase; color:var(--fg-faint); }

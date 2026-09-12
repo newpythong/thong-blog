@@ -104,8 +104,8 @@
     el.classList.add('in');
     const words = el.classList.contains('rv') ? el.querySelectorAll('.rv-w > i') : [];
     if (hasGSAP && words.length && !RM) {
-      gsap.fromTo(words, { yPercent: 112 }, {
-        yPercent: 0, duration: 1.15, ease: 'expo.out', stagger: 0.045, overwrite: true
+      gsap.fromTo(words, { yPercent: 112, y: 0 }, {
+        yPercent: 0, y: 0, duration: 1.15, ease: 'expo.out', stagger: 0.045, overwrite: true
       });
     } else {
       words.forEach((i, k) => { i.style.transitionDelay = (k * 45) + 'ms'; });
@@ -116,8 +116,11 @@
     es.forEach(e => { if (e.isIntersecting) { reveal(e.target); io.unobserve(e.target); } });
   }, { threshold: 0.08, rootMargin: '0px 0px -6% 0px' });
 
+  /* Chữ trong sân khấu do dòng thời gian cuộn nắm, không để observer đụng vào —
+     hai bên cùng tween một phần tử thì overwrite của bên này giết tween bên kia. */
   const observeAll = (root = document) => {
     root.querySelectorAll('.rise:not(.in), .rv:not(.in)').forEach((el, i) => {
+      if (el.closest('.acts') && !document.documentElement.classList.contains('no-stage')) return;
       if (!el.style.transitionDelay && !el.classList.contains('rv'))
         el.style.transitionDelay = (i % 6) * 70 + 'ms';
       io.observe(el);
@@ -128,33 +131,90 @@
 
   /* phần mở đầu đã nằm trong khung nhìn — cho hiện ngay sau màn mở */
   function openHero() {
-    document.querySelectorAll('.hero .rv, .hero .rise').forEach((el, i) => {
-      if (el.classList.contains('in')) return;
-      setTimeout(() => reveal(el), i * 90);
-    });
+    document.querySelectorAll('.act--open .rv, .act--open .rise, .hero .rv, .hero .rise')
+      .forEach((el, i) => {
+        if (el.classList.contains('in')) return;
+        setTimeout(() => reveal(el), i * 90);
+      });
   }
   if (!veil) requestAnimationFrame(openHero);
 
-  /* ── nhịp theo cuộn ─────────────────────────────────── */
-  const hero = document.querySelector('.hero');
-  if (hero) {
-    const inner = hero.querySelector('.hero__inner');
-    const onProgress = v => { if (scene) scene.setScroll(v); };
+  /* ══ SÂN KHẤU — ghim màn hình, cuộn để chuyển cảnh ══ */
+  const stage = document.querySelector('.stage');
+  if (stage && scene) {
+    const inner = stage.querySelector('.stage__inner');
+    const acts = [...stage.querySelectorAll('.act')];
+    const cue = stage.querySelector('.scrollcue');
+    const N = acts.length;
 
-    if (hasGSAP && !RM) {
-      ScrollTrigger.create({
-        trigger: hero, start: 'top top', end: 'bottom top',
-        onUpdate: self => onProgress(self.progress)
-      });
-      if (inner) gsap.to(inner, {
-        yPercent: -18, opacity: 0.25, ease: 'none',
-        scrollTrigger: { trigger: hero, start: 'top top', end: 'bottom top', scrub: 0.6 }
-      });
+    if (!hasGSAP || RM) {
+      /* không có thư viện hoặc người dùng tắt chuyển động:
+         xếp các hồi thành một cột, cảnh dừng ở hồi đầu */
+      document.documentElement.classList.add('no-stage');
+      acts.forEach(reveal);
+      scene.setStage(0);
+      if (cue) cue.style.display = 'none';
     } else {
-      addEventListener('scroll', () => {
-        onProgress(Math.min(1, scrollY / Math.max(1, hero.offsetHeight)));
-      }, { passive: true });
+      /* chữ của hồi 2..n bắt đầu ở dưới mặt nạ, chờ tới lượt */
+      acts.forEach((el, i) => {
+        if (i === 0) return;
+        el.classList.add('in');                       // observer bỏ qua hẳn
+        gsap.set(el.querySelectorAll('.rv-w > i'), { yPercent: 112, y: 0 });
+        const sub = el.querySelector('.act__sub');
+        if (sub) gsap.set(sub, { opacity: 0, y: 24 });
+      });
+
+      const tl = gsap.timeline({
+        scrollTrigger: {
+          trigger: stage,
+          start: 'top top',
+          end: () => '+=' + (innerHeight * (N - 1) * 1.15),
+          pin: inner,
+          pinSpacing: true,
+          scrub: 1.1,
+          anticipatePin: 1,
+          invalidateOnRefresh: true,
+          onUpdate: self => {
+            scene.setStage(self.progress);
+            if (petalField) petalField.speed(1 + self.progress * 1.1);
+          }
+        }
+      });
+
+      /* mỗi hồi chiếm một đoạn bằng nhau trên dòng thời gian */
+      const seg = 1 / (N - 1);
+      acts.forEach((el, i) => {
+        const words = el.querySelectorAll('.rv-w > i');
+        const sub = el.querySelector('.act__sub');
+        const meta = el.querySelector('.act__meta');
+        const brow = el.querySelector('.eyebrow');
+        const at = i * seg;
+
+        if (i > 0) {
+          tl.set(el, { visibility: 'visible' }, at - seg * 0.30)
+            .fromTo(el, { opacity: 0 }, { opacity: 1, duration: seg * 0.30, ease: 'power2.out' }, at - seg * 0.30)
+            .fromTo(brow, { opacity: 0, y: 16 }, { opacity: 1, y: 0, duration: seg * 0.24, ease: 'power2.out' }, at - seg * 0.26)
+            .to(words, { yPercent: 0, y: 0, duration: seg * 0.42, ease: 'expo.out', stagger: seg * 0.045 }, at - seg * 0.28)
+            .to(sub, { opacity: 1, y: 0, duration: seg * 0.30, ease: 'power2.out' }, at - seg * 0.14);
+        }
+        /* hồi trước lùi ra sau, chữ chìm xuống — như một cú cắt cảnh */
+        if (i < N - 1) {
+          const out = at + seg * 0.62;
+          tl.to(words, { yPercent: -110, y: 0, duration: seg * 0.34, ease: 'power3.in', stagger: seg * 0.03 }, out)
+            .to([sub, meta, brow].filter(Boolean), { opacity: 0, y: -22, duration: seg * 0.30, ease: 'power2.in' }, out)
+            .to(el, { opacity: 0, duration: seg * 0.34, ease: 'power2.in' }, out + seg * 0.04)
+            .set(el, { visibility: 'hidden' }, out + seg * 0.38);
+        }
+      });
+
+      if (cue) tl.to(cue, { opacity: 0, duration: seg * 0.4 }, 0);
+
+      /* cửa sổ đổi cỡ thì đo lại, nếu không điểm ghim lệch */
+      addEventListener('resize', () => ScrollTrigger.refresh(), { passive: true });
     }
+  } else if (stage) {
+    document.documentElement.classList.add('no-stage');
+    stage.querySelectorAll('.act').forEach(reveal);
   }
 
   /* núi chia đoạn trôi ngược chiều cuộn */
@@ -165,10 +225,10 @@
         scrollTrigger: { trigger: el.parentElement || el, start: 'top bottom', end: 'bottom top', scrub: 0.8 }
       });
     });
-    document.querySelectorAll('.ridge svg path').forEach((p, i) => {
-      gsap.fromTo(p, { yPercent: 14 - i * 6 }, {
+    document.querySelectorAll('.ridge svg path').forEach((pa, i) => {
+      gsap.fromTo(pa, { yPercent: 14 - i * 6 }, {
         yPercent: -6 + i * 4, ease: 'none',
-        scrollTrigger: { trigger: p.closest('.ridge'), start: 'top bottom', end: 'bottom top', scrub: 0.9 }
+        scrollTrigger: { trigger: pa.closest('.ridge'), start: 'top bottom', end: 'bottom top', scrub: 0.9 }
       });
     });
   }

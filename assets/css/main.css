@@ -149,63 +149,69 @@ section{ position:relative; }
 .nav__links a:hover::after{ transform:scaleX(1); transform-origin:left; }
 @media(max-width:760px){ .nav__links a.opt{ display:none; } }
 
-/* ── núi mở đầu ───────────────────────────────────────── */
-.hero{ position:relative; min-height:100svh; display:grid; align-items:end;
-  overflow:hidden; }
+/* ── sân khấu mở đầu ──────────────────────────────────── */
+.stage{ position:relative; }
+.stage__inner{ position:relative; height:100svh; overflow:hidden;
+  display:grid; align-items:end; }
 .hero__canvas{ position:absolute; inset:0; width:100%; height:100%; z-index:0; }
-/* chữ nằm đè lên mặt nước — lớp tan này giữ cho nền dưới chân chữ đủ nhạt */
-.hero__fade{ position:absolute; inset:auto 0 0 0; height:52%; z-index:1;
-  background:linear-gradient(to bottom,
-    rgba(247,239,219,0) 0%,
-    rgba(247,239,219,.32) 26%,
-    rgba(247,239,219,.66) 54%,
-    rgba(247,239,219,.90) 80%,
-    var(--lua) 100%); }
-/* sương tạt từ trái sang — giữ nền dưới chân tiêu đề đủ nhạt để đọc */
-.hero__wash{ position:absolute; inset:0; z-index:2; pointer-events:none;
+
+/* sương tạt từ trái — giữ nền dưới chân chữ đủ nhạt để đọc */
+.hero__wash{ position:absolute; inset:0; z-index:1; pointer-events:none;
   background:linear-gradient(102deg,
     rgba(247,239,219,.93) 0%,
     rgba(247,239,219,.80) 18%,
     rgba(247,239,219,.46) 38%,
     rgba(247,239,219,.14) 54%,
     rgba(247,239,219,0) 68%); }
+.hero__fade{ position:absolute; inset:auto 0 0 0; height:52%; z-index:1;
+  pointer-events:none;
+  background:linear-gradient(to bottom,
+    rgba(247,239,219,0) 0%,
+    rgba(247,239,219,.32) 26%,
+    rgba(247,239,219,.66) 54%,
+    rgba(247,239,219,.90) 80%,
+    var(--lua) 100%); }
 @media(max-width:820px){
   .hero__wash{ background:linear-gradient(to bottom,
-    rgba(247,239,219,.28) 0%, rgba(247,239,219,.72) 46%, rgba(247,239,219,.9) 100%); }
+    rgba(247,239,219,.30) 0%, rgba(247,239,219,.74) 46%, rgba(247,239,219,.92) 100%); }
 }
-.hero__inner{ position:relative; z-index:3; padding-block:9rem 6rem; }
 
-.eyebrow{
-  font-family:var(--mono); font-size:.66rem; letter-spacing:.3em; text-transform:uppercase;
-  color:var(--muc-2); display:flex; align-items:center; gap:.9rem; margin-bottom:1.6rem;
-}
-.eyebrow::before{ content:""; width:clamp(24px,4vw,56px); height:1px; background:var(--son); }
+/* các hồi chồng lên nhau, chỉ một hồi hiện mỗi lúc */
+.acts{ position:absolute; inset:0; z-index:3; display:grid; }
+.act{ grid-area:1/1; align-self:end; padding-block:0 7rem;
+  opacity:0; visibility:hidden; }
+.act--open{ opacity:1; visibility:visible; }
+.act .eyebrow{ margin-bottom:1.4rem; }
 
-.hero h1{
+.act h1{
   font-family:var(--serif); font-weight:300;
   font-size:clamp(2.9rem,8.4vw,7.4rem);
   line-height:1.04; letter-spacing:-.028em; margin:0;
   text-wrap:balance; color:var(--tram);
 }
-.hero h1 .ln{ display:block; overflow:hidden; padding-top:.1em; margin-top:-.1em; }
-.hero h1 em{ font-style:italic; font-weight:300; color:var(--son); }
+.act h1 .ln{ display:block; overflow:hidden; padding-top:.1em; margin-top:-.1em; }
+.act h1 em{ font-style:italic; font-weight:300; color:var(--son); }
 
-.hero__meta{ margin-top:2.4rem; display:flex; flex-wrap:wrap; gap:1.8rem 3.2rem;
+.act__line{
+  font-family:var(--serif); font-weight:300; margin:0;
+  font-size:clamp(2.4rem,7vw,6rem); line-height:1.08; letter-spacing:-.028em;
+  color:var(--tram); text-wrap:balance; max-width:16ch;
+}
+.act__line .rv-w{ overflow:hidden; }
+.act__sub{ margin:1.4rem 0 0; max-width:34ch; color:var(--muc-2);
+  font-size:clamp(1rem,1.6vw,1.2rem); }
+
+.act__meta{ margin-top:2.4rem; display:flex; flex-wrap:wrap; gap:1.8rem 3.2rem;
   align-items:flex-start; }
-.hero__lede{ max-width:44ch; color:var(--muc-2); font-size:1rem; margin:0; }
-.hero__lede strong{ color:var(--muc); font-weight:600; }
-.hero__stat{ font-family:var(--mono); font-size:.66rem; letter-spacing:.18em;
+.act__lede{ max-width:44ch; color:var(--muc-2); font-size:1rem; margin:0; }
+.act__lede strong{ color:var(--muc); font-weight:600; }
+.act__stat{ font-family:var(--mono); font-size:.66rem; letter-spacing:.18em;
   text-transform:uppercase; color:var(--muc-3); line-height:1.9; }
-.hero__stat b{ display:block; font-family:var(--serif); font-weight:300; font-size:2.4rem;
+.act__stat b{ display:block; font-family:var(--serif); font-weight:300; font-size:2.4rem;
   letter-spacing:0; color:var(--tram); text-transform:none; line-height:1.1; }
 
-.enso{ position:absolute; z-index:2; pointer-events:none;
-  width:clamp(240px,32vw,460px); aspect-ratio:1; right:4%; top:14%; opacity:.42; }
-.enso circle{ fill:none; stroke:var(--son); stroke-width:2.2; stroke-linecap:round; }
-@media(max-width:900px){ .enso{ display:none; } }
-
 .scrollcue{
-  position:absolute; right:var(--gut); bottom:2rem; z-index:3;
+  position:absolute; right:var(--gut); bottom:2rem; z-index:4;
   font-family:var(--mono); font-size:.6rem; letter-spacing:.28em; text-transform:uppercase;
   color:var(--muc-3); display:flex; align-items:center; gap:.8rem;
 }
@@ -215,6 +221,11 @@ section{ position:relative; }
   animation:cue 2.4s cubic-bezier(.65,.05,.36,1) infinite; }
 @keyframes cue{ 0%{transform:translateY(-100%)} 55%,100%{transform:translateY(100%)} }
 @media(max-width:600px){ .scrollcue{ display:none; } }
+
+/* không có JS hoặc người dùng tắt chuyển động: xếp các hồi thành một cột đọc được */
+html.no-stage .acts{ position:relative; display:block; }
+html.no-stage .act{ opacity:1; visibility:visible; padding-block:3rem; }
+html.no-stage .stage__inner{ height:auto; min-height:100svh; }
 
 /* ── dải trầm (tương phản) ────────────────────────────── */
 .band-deep{
@@ -297,18 +308,6 @@ html.gsap .rv-w > i{ transition:none; }
 }
 .empty{ padding:4rem 0; text-align:center; color:var(--fg-faint); font-family:var(--mono);
   font-size:.74rem; letter-spacing:.22em; text-transform:uppercase; }
-
-/* ── dải chữ chạy ─────────────────────────────────────── */
-.marquee{ overflow:hidden; padding-block:clamp(2.5rem,6vh,4.5rem);
-  border-block:1px solid var(--rule); background:var(--lua-2); }
-.marquee__t{ display:flex; gap:3rem; width:max-content;
-  animation:slide 38s linear infinite; }
-.marquee__t span{ font-family:var(--serif); font-weight:300;
-  font-size:clamp(2rem,6vw,4.6rem); line-height:1.25; letter-spacing:-.02em;
-  white-space:nowrap; color:var(--dat); }
-.marquee__t span:nth-child(even){ color:transparent;
-  -webkit-text-stroke:1px var(--muc-3); }
-@keyframes slide{ to{ transform:translateX(-50%); } }
 
 /* ── núi chia đoạn ────────────────────────────────────── */
 .ridge{ line-height:0; background:var(--lua); overflow:hidden; }

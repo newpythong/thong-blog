@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Báo cáo bàn giao — Mực</title>
+<meta name="robots" content="noindex, nofollow">
+<meta name="theme-color" content="#f7efdb">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' fill='%23f7efdb'/%3E%3Cpath d='M6 76 L34 34 L50 58 L64 26 L94 76 Z' fill='%23b4441f'/%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,200..600;1,6..72,200..500&family=Be+Vietnam+Pro:ital,wght@0,300;0,400;0,500;0,600;1,400&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/css/main.css">
+<style>
+  .rp{ padding:6.5rem 0 5rem; }
+  .rp h1{ font-family:var(--serif); font-weight:300; color:var(--tram);
+    font-size:clamp(2.4rem,6.5vw,4.2rem); line-height:1.06; letter-spacing:-.025em;
+    margin:.8rem 0 0; max-width:17ch; text-wrap:balance; }
+  .rp h1 em{ font-style:italic; color:var(--son); }
+  .rp__sub{ font-size:1.04rem; color:var(--fg-dim); max-width:54ch; margin:1.1rem 0 1.8rem; }
+  .rp section{ padding-top:3.2rem; }
+  .rp h2{ font-family:var(--serif); font-weight:300; font-size:1.85rem; line-height:1.22;
+    margin:0 0 1.3rem; padding-bottom:.6rem; border-bottom:1px solid var(--rule);
+    color:var(--tram); letter-spacing:-.015em; }
+  .rp p{ margin:0 0 1rem; max-width:64ch; }
+  .rp .lede{ color:var(--fg-dim); }
+  .k{ font-family:var(--mono); font-size:.83em; background:var(--lua-3);
+    border:1px solid var(--vien); border-radius:3px; padding:.08em .4em; white-space:nowrap; }
+  .rows{ display:grid; border-top:1px solid var(--rule); }
+  .rows > div{ display:grid; grid-template-columns:11rem minmax(0,1fr); gap:1rem;
+    padding:.75rem 0; border-bottom:1px solid var(--rule); align-items:baseline; }
+  @media(max-width:660px){ .rows > div{ grid-template-columns:1fr; gap:.15rem; } }
+  .rows .t{ font-family:var(--mono); font-size:.7rem; letter-spacing:.06em;
+    text-transform:uppercase; color:var(--fg-faint); }
+  .rows .v{ color:var(--fg-dim); font-size:.95rem; }
+  .act{ background:var(--lua-2); border-left:3px solid var(--son); padding:1.5rem 1.7rem; }
+  .act ol{ margin:0; padding-left:1.2rem; display:grid; gap:.85rem; }
+  .act li{ max-width:58ch; }
+  .act li::marker{ font-family:var(--mono); font-size:.85rem; color:var(--son); }
+  .checks{ list-style:none; margin:0; padding:0; display:grid; gap:.5rem; }
+  .checks li{ display:grid; grid-template-columns:1.3rem minmax(0,1fr); gap:.6rem;
+    align-items:baseline; color:var(--fg-dim); font-size:.95rem; }
+  .checks li::before{ content:"✓"; color:#4a6b3f; font-weight:600; font-size:.88rem; }
+  .checks b{ color:var(--fg); font-weight:500; }
+  .warn{ display:grid; gap:1rem; }
+  .warn > div{ padding-left:1rem; border-left:2px solid var(--son); }
+  .warn h3{ font-family:var(--sans); font-weight:600; font-size:.95rem; margin:0 0 .2rem; }
+  .warn p{ margin:0; font-size:.93rem; color:var(--fg-dim); }
+  .sw{ display:flex; flex-wrap:wrap; gap:.6rem; margin-top:1.1rem; }
+  .sw > div{ display:flex; flex-direction:column; gap:.35rem; }
+  .sw i{ display:block; width:4.6rem; height:2.8rem; border:1px solid var(--vien); border-radius:2px; }
+  .sw b{ font-size:.72rem; font-weight:500; color:var(--fg-dim); }
+  .sw span{ font-family:var(--mono); font-size:.62rem; color:var(--fg-faint); }
+  .big{ font-family:var(--serif); font-weight:300; font-size:2.6rem; color:var(--son);
+    line-height:1; letter-spacing:-.02em; }
+</style>
+</head>
+<body>
+
+<canvas class="petals" data-density="0.55" data-alpha="0.75" aria-hidden="true"></canvas>
+<canvas class="ripples" aria-hidden="true"></canvas>
+<div class="grain"></div>
+<div class="prog"></div>
+
+<nav class="nav">
+  <a class="nav__logo" href="./">
+    <svg class="mk" viewBox="0 0 40 22" aria-hidden="true"><path d="M1 20 L11 6 L17 14 L23 2 L31 13 L39 20 Z"/></svg>
+    <b>Mực</b>
+  </a>
+  <div class="nav__links">
+    <a href="./">Trang chủ</a>
+    <a href="admin.html">Viết</a>
+  </div>
+</nav>
+
+<main class="rp wrap wrap--read">
+
+  <div class="eyebrow">Báo cáo bàn giao &nbsp;·&nbsp; 12.09.2026</div>
+  <h1>Sơn thuỷ, <em>hoa rơi</em>, và nước chảy</h1>
+  <p class="rp__sub">Vòng này tập trung vào chuyển động: một cảnh sơn thuỷ vẽ bằng canvas, cuộn trang có quán tính, và hoa rơi phủ suốt mọi trang để cả site thành một mạch.</p>
+  <div class="stream" aria-hidden="true"></div>
+
+  <section>
+    <h2>Thư viện đã dùng</h2>
+    <p class="lede">Chọn theo đúng việc, không ôm đồm. Cả hai đều không bắt buộc — nếu trình duyệt chặn CDN thì trang vẫn chạy đủ chức năng, chỉ bớt mượt.</p>
+    <div class="rows">
+      <div><span class="t">GSAP 3.15</span><span class="v">Cùng ScrollTrigger, lo nhịp theo cuộn: chữ hiện theo từng từ, núi chia đoạn trôi ngược, phần mở đầu mờ dần khi cuộn qua. GreenSock được Webflow mua lại năm 2024 và mở miễn phí hoàn toàn từ 2025, kể cả dùng thương mại.</span></div>
+      <div><span class="t">Lenis 1.3.26</span><span class="v">Quán tính cuộn. Đây là thứ tạo ra cảm giác phiêu nhiều nhất — trang không giật từng nấc mà trôi rồi lặng dần. Lenis được chọn vì không phá <span class="k">position:sticky</span>, thứ mà khung xem trước bên trang soạn thảo đang dùng.</span></div>
+      <div><span class="t">Không dùng</span><span class="v">Không có framework, không bước dựng, không npm. Cảnh sơn thuỷ viết tay bằng canvas 2d — một thư viện hạt sẵn sẽ cho ra thứ trông như mọi trang khác.</span></div>
+    </div>
+  </section>
+
+  <section>
+    <h2>Cảnh sơn thuỷ</h2>
+    <div class="rows">
+      <div><span class="t">Núi</span><span class="v">Sáu dãy sinh bằng nhiễu fractal ba đến năm tầng. So với bản trước đã <strong>giảm tần số và tăng biên độ</strong> — ít đỉnh hơn nhưng mỗi đỉnh lớn hơn, vì hùng vĩ đến từ vài khối lớn chứ không phải nhiều mỏm nhỏ.</span></div>
+      <div><span class="t">Chiều sâu</span><span class="v">Mỗi dãy trôi ngang một tốc độ: dãy gần nhanh gấp gần mười lần dãy xa. Khi cuộn, các dãy dâng lệch nhau theo hệ số riêng.</span></div>
+      <div><span class="t">Nước</span><span class="v">Bóng núi được lật ngược theo từng lát ngang, mỗi lát lệch đi một đoạn tính bằng hai hàm sin chồng nhau — càng xuống sâu gợn càng mạnh. Thêm vệt sáng trôi ngang và sương là là mặt nước.</span></div>
+      <div><span class="t">Hoa rơi</span><span class="v">Mỗi cánh là hai đường bezier có khuyết nhẹ ở chóp. Cánh lật quanh trục dọc bằng <span class="k">cos</span> để giả chiều thứ ba, kèm xoay và đưa võng riêng. Cuộn nhanh thì cả đám hoa bạt theo rồi lặng dần.</span></div>
+      <div><span class="t">Sương tạt</span><span class="v">Một lớp sương phủ chéo từ trái sang. Vừa đúng chất sơn thuỷ, vừa giữ nền dưới chân tiêu đề đủ nhạt để chữ nâu đọc được trên núi đậm.</span></div>
+      <div><span class="t">Sóng lan</span><span class="v">Bấm chuột chỗ nào cũng lan ra ba vòng sóng màu son rồi tan.</span></div>
+    </div>
+  </section>
+
+  <section>
+    <h2>Chỗ suýt hỏng: hiệu năng</h2>
+    <p>Bản đầu tiên của mặt nước chạy <strong>17 khung hình mỗi giây</strong>. Vòng lặp phản chiếu sao chép nguyên khung ở độ phân giải gấp đôi, khoảng 170 lát mỗi khung, mỗi lát rộng 2880 điểm ảnh — và nó đọc ngược từ chính canvas đang vẽ.</p>
+    <p>Sửa bằng hai việc: tách phần trên mặt nước ra một canvas phụ để không vừa đọc vừa ghi trên cùng một bề mặt, và <strong>dựng bóng nước ở nửa độ phân giải</strong> rồi mới phóng to — nước vốn đã nhoè nên không ai thấy khác, mà khối lượng điểm ảnh giảm bốn lần.</p>
+    <p class="big">17 → 60 khung hình/giây</p>
+    <p style="margin-top:1rem">Thêm một cơ chế tự hạ: nếu khung hình kéo dài quá 26 mili-giây liên tục, số lát cắt bóng nước tự thưa dần ra để cảnh vẫn trôi mượt trên máy yếu.</p>
+  </section>
+
+  <section>
+    <h2>Đăng nhập và viết bài</h2>
+    <p>Phần này không đổi so với lần trước. Trang tĩnh không có cơ sở dữ liệu, nên tài khoản của bạn chính là GitHub.</p>
+    <div class="act">
+      <ol>
+        <li>Mở <a href="https://github.com/settings/personal-access-tokens/new" target="_blank" rel="noopener">trang tạo fine-grained token</a> của GitHub.</li>
+        <li><b>Repository access</b> → <em>Only select repositories</em> → <span class="k">newpythong/thong-blog</span>.</li>
+        <li><b>Permissions</b> → Repository permissions → <b style="color:var(--son)">Contents: Read and write</b>. Không cần bật thêm gì khác.</li>
+        <li>Generate token, sao chép chuỗi <span class="k">github_pat_…</span>.</li>
+        <li>Vào <a href="admin.html">trang soạn thảo</a>, dán vào, bấm <em>Vào nghiên</em>.</li>
+      </ol>
+    </div>
+    <p style="margin-top:1.3rem">Viết Markdown, có khung xem trước cập nhật theo từng phím gõ. Bấm <em>Đăng lên prod</em> hoặc <span class="k">⌘S</span> là commit thẳng vào repo; GitHub Pages dựng lại sau khoảng 30–60 giây.</p>
+  </section>
+
+  <section>
+    <h2>Màu và chữ</h2>
+    <div class="sw">
+      <div><i style="background:#f7efdb"></i><b>Lụa</b><span>#f7efdb</span></div>
+      <div><i style="background:#e7d7b3"></i><b>Lụa đậm</b><span>#e7d7b3</span></div>
+      <div><i style="background:#c1801a"></i><b>Nghệ</b><span>#c1801a</span></div>
+      <div><i style="background:#8c5a22"></i><b>Đất nung</b><span>#8c5a22</span></div>
+      <div><i style="background:#b4441f"></i><b>Son</b><span>#b4441f</span></div>
+      <div><i style="background:#392b19"></i><b>Trầm</b><span>#392b19</span></div>
+    </div>
+    <div class="rows" style="margin-top:1.8rem">
+      <div><span class="t">Tiêu đề, thân bài</span><span class="v"><strong>Newsreader</strong> — có đủ bộ dấu tiếng Việt, vốn được thiết kế để đọc dài trên màn hình.</span></div>
+      <div><span class="t">Giao diện</span><span class="v"><strong>Be Vietnam Pro</strong> — dấu được vẽ riêng chứ không ghép tự động.</span></div>
+      <div><span class="t">Nhãn, số liệu</span><span class="v"><strong>JetBrains Mono</strong>.</span></div>
+      <div><span class="t">Đã dọn</span><span class="v">Bộ chữ Nhật Shippori Mincho còn sót trong hai trang đã gỡ hẳn. Không còn chữ Hán, chữ Nhật ở bất cứ đâu trong repo.</span></div>
+    </div>
+  </section>
+
+  <section>
+    <h2>Đã kiểm tra</h2>
+    <ul class="checks">
+      <li><b>Năm trang chạy sạch</b> — mở bằng trình duyệt thật, không lỗi JavaScript, không tài nguyên nào tải hỏng.</li>
+      <li><b>60 khung hình/giây</b> — đo trên khung 1440×900 với cả cảnh núi nước lẫn hoa rơi đang chạy.</li>
+      <li><b>Thư viện nạp đúng</b> — GSAP, ScrollTrigger và Lenis đều có mặt trên bản chạy thật.</li>
+      <li><b>Tôn trọng người dùng</b> — bật <span class="k">prefers-reduced-motion</span> thì hoa tắt hẳn, núi vẽ một khung tĩnh, chữ hiện đủ, không còn chuyển động nào.</li>
+      <li><b>Điện thoại</b> — khung 390×844 không tràn ngang, sương chuyển sang phủ từ trên xuống cho hợp chiều dọc.</li>
+      <li><b>Trang lạc đường</b> — kiểm riêng trên tên miền thật vì nó dùng đường dẫn tuyệt đối, chạy cục bộ không xác minh được.</li>
+    </ul>
+  </section>
+
+  <section>
+    <h2>Nên biết</h2>
+    <div class="warn">
+      <div>
+        <h3>Hai link báo cáo trước đã mất</h3>
+        <p>Báo cáo hai lần trước được đăng dạng artifact và cả hai đều biến mất khỏi tài khoản của bạn. Nên lần này báo cáo nằm thẳng trong blog, cùng repo, cùng bộ CSS — link còn thì blog còn.</p>
+      </div>
+      <div>
+        <h3>Repo đang để công khai</h3>
+        <p>GitHub Pages chỉ miễn phí cho repo công khai. Bài nháp chỉ ẩn khỏi trang chủ chứ không bí mật.</p>
+      </div>
+      <div>
+        <h3>Token là chìa khoá</h3>
+        <p>Token nằm trong bộ nhớ trình duyệt của bạn, chỉ có quyền ghi nội dung đúng repo này. Trên máy lạ nhớ bỏ tích "Ghi nhớ"; lỡ lộ thì thu hồi trong Settings của GitHub.</p>
+      </div>
+    </div>
+  </section>
+
+</main>
+
+<footer class="foot">
+  <div class="wrap wrap--read">
+    <h2 class="foot__big"><a href="./">← Về trang chủ</a></h2>
+    <div class="foot__row">
+      <div>© 2026 Thông</div>
+      <div>newpythong/thong-blog</div>
+      <div>Gặp một lần, quý một lần</div>
+    </div>
+  </div>
+</footer>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.15.0/gsap.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.15.0/ScrollTrigger.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/lenis@1.3.26/dist/lenis.min.js"></script>
+<script>if(window.gsap&&window.ScrollTrigger)document.documentElement.classList.add('gsap');</script>
+<script src="assets/js/scene.js"></script>
+<script src="assets/js/motion.js"></script>
+</body>
+</html>

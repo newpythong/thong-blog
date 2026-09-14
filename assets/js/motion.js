@@ -68,6 +68,7 @@
   if (S) {
     const cv = document.querySelector('.hero__canvas');
     if (cv) scene = S.mountains(cv);
+    window.__scene = scene;          // mở ra để soi cảnh từ bảng điều khiển
 
     const pc = document.querySelector('.petals');
     if (pc) petalField = S.petals(pc, {
@@ -190,20 +191,23 @@
         const brow = el.querySelector('.eyebrow');
         const at = i * seg;
 
+        /* Hồi sau chỉ vào khi hồi trước đã khuất hẳn: ra xong ở 0.78 của một
+           đoạn, vào bắt đầu ở 0.80. Trước đây hai mốc chồng nhau nên có lúc
+           thấy hai đầu đề đè lên nhau. */
         if (i > 0) {
-          tl.set(el, { visibility: 'visible' }, at - seg * 0.30)
-            .fromTo(el, { opacity: 0 }, { opacity: 1, duration: seg * 0.30, ease: 'power2.out' }, at - seg * 0.30)
-            .fromTo(brow, { opacity: 0, y: 16 }, { opacity: 1, y: 0, duration: seg * 0.24, ease: 'power2.out' }, at - seg * 0.26)
-            .to(words, { yPercent: 0, y: 0, duration: seg * 0.42, ease: 'expo.out', stagger: seg * 0.045 }, at - seg * 0.28)
-            .to(sub, { opacity: 1, y: 0, duration: seg * 0.30, ease: 'power2.out' }, at - seg * 0.14);
+          tl.set(el, { visibility: 'visible' }, at - seg * 0.20)
+            .fromTo(el, { opacity: 0 }, { opacity: 1, duration: seg * 0.20, ease: 'power2.out' }, at - seg * 0.20)
+            .fromTo(brow, { opacity: 0, y: 16 }, { opacity: 1, y: 0, duration: seg * 0.18, ease: 'power2.out' }, at - seg * 0.18)
+            .to(words, { yPercent: 0, y: 0, duration: seg * 0.34, ease: 'expo.out', stagger: seg * 0.035 }, at - seg * 0.19)
+            .to(sub, { opacity: 1, y: 0, duration: seg * 0.24, ease: 'power2.out' }, at - seg * 0.08);
         }
         /* hồi trước lùi ra sau, chữ chìm xuống — như một cú cắt cảnh */
         if (i < N - 1) {
-          const out = at + seg * 0.62;
-          tl.to(words, { yPercent: -110, y: 0, duration: seg * 0.34, ease: 'power3.in', stagger: seg * 0.03 }, out)
-            .to([sub, meta, brow].filter(Boolean), { opacity: 0, y: -22, duration: seg * 0.30, ease: 'power2.in' }, out)
-            .to(el, { opacity: 0, duration: seg * 0.34, ease: 'power2.in' }, out + seg * 0.04)
-            .set(el, { visibility: 'hidden' }, out + seg * 0.38);
+          const out = at + seg * 0.52;
+          tl.to(words, { yPercent: -110, y: 0, duration: seg * 0.24, ease: 'power3.in', stagger: seg * 0.02 }, out)
+            .to([sub, meta, brow].filter(Boolean), { opacity: 0, y: -22, duration: seg * 0.22, ease: 'power2.in' }, out)
+            .to(el, { opacity: 0, duration: seg * 0.24, ease: 'power2.in' }, out + seg * 0.02)
+            .set(el, { visibility: 'hidden' }, out + seg * 0.26);
         }
       });
 

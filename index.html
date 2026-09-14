@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Mực — Nhật ký của Thông</title>
+<title>Tiêu Dao</title>
 <meta name="theme-color" content="#f7efdb">
 <meta name="description" content="Một khoảng lặng giữa thiền và máy. Ghi chép, chiêm nghiệm, và những gì còn lại sau khi tắt màn hình.">
 <meta property="og:title" content="Mực — Nhật ký của Thông">
@@ -13,7 +13,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,200..600;1,6..72,200..500&family=Be+Vietnam+Pro:ital,wght@0,300;0,400;0,500;0,600;1,400&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="assets/css/main.css?v=260914a">
+<link rel="stylesheet" href="assets/css/main.css?v=260914b">
 </head>
 <body>
 
@@ -50,20 +50,12 @@
       <!-- hồi một -->
       <article class="act act--open" data-act="0">
         <div class="wrap">
-          <div class="eyebrow">Nhật ký của Thông</div>
-          <h1>
-            <span class="ln" data-split>Tĩnh tại</span>
-            <span class="ln" data-split>giữa <em>nhiễu động</em></span>
-          </h1>
-          <div class="act__meta">
-            <p class="act__lede">
-              Tôi viết ở đây khi màn hình đã tắt và đầu vẫn còn sáng.
-              <strong>Không lịch đăng, không thành tích, không thuật toán.</strong>
-            </p>
-            <div class="act__stat">
-              <b data-count>—</b>
-              bài đã viết
-            </div>
+          <div class="zen">
+            <h1 class="zen__w">
+              <span class="ln" data-split>Tiêu</span>
+              <span class="ln" data-split><em>Dao</em></span>
+            </h1>
+            <div class="zen__seal" aria-hidden="true"></div>
           </div>
         </div>
       </article>
@@ -121,17 +113,14 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.15.0/ScrollTrigger.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/lenis@1.3.26/dist/lenis.min.js"></script>
 <script>if(window.gsap&&window.ScrollTrigger)document.documentElement.classList.add('gsap');</script>
-<script src="assets/js/core.js?v=260914a"></script>
-<script src="assets/js/scene.js?v=260914a"></script>
-<script src="assets/js/motion.js?v=260914a"></script>
+<script src="assets/js/core.js?v=260914b"></script>
+<script src="assets/js/scene.js?v=260914b"></script>
+<script src="assets/js/motion.js?v=260914b"></script>
 <script>
 (async () => {
   const S = window.SUMI;
   const list = document.getElementById('list');
   const posts = await S.loadIndex();
-
-  const n = document.querySelector('[data-count]');
-  if (n) n.textContent = String(posts.length).padStart(2, '0');
 
   if (!posts.length) {
     list.innerHTML = '<div class="empty">Chưa có bài nào — <a class="lnk" href="admin.html">viết bài đầu tiên</a></div>';

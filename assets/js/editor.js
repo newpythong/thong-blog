@@ -12,7 +12,7 @@
 
   let token = null, sha = {}, editing = null, quill = null, me = '';
 
-  const BUILD = '260914a';          // đổi mỗi lần sửa, để biết trình duyệt đang chạy bản nào
+  const BUILD = '260914b';          // đổi mỗi lần sửa, để biết trình duyệt đang chạy bản nào
 
   $('repoName').textContent = C.owner + '/' + C.repo;
   if ($('ver')) $('ver').textContent = 'bản ' + BUILD;
@@ -210,7 +210,7 @@
     token = tok;
     me = user || 'bạn';
     $('who').textContent = me;
-    document.title = 'Viết bài — ' + me;
+    document.title = 'Viết bài — ' + me + ' · Tiêu Dao';
     show('ed');
     buildEditor();
     blank();

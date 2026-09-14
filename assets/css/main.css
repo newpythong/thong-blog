@@ -208,6 +208,47 @@ section{ position:relative; }
 .act h1 .ln{ display:block; overflow:hidden; padding-top:.1em; margin-top:-.1em; }
 .act h1 em{ font-style:italic; font-weight:300; color:var(--son); }
 
+/* ── thanh trên, màn hẹp ───────────────────────────────
+   Ở 390px logo và các mục dính vào nhau: cả hai đều không co lại được.
+   Thu logo, giãn khoảng cách, cho phép xuống dòng. */
+@media(max-width:560px){
+  .nav{ padding:.85rem var(--gut); gap:.75rem; }
+  .nav__logo .mk{ width:26px; }
+  .nav__logo b{ font-size:1.15rem; }
+  .nav__links{ gap:.9rem; font-size:.6rem; letter-spacing:.12em; }
+  .nav__cta{ padding:.5rem .75rem; }
+}
+
+/* ── Tiêu Giao: hai chữ trong một vòng tròn ───────────── */
+.act--open{ align-self:center; padding-block:0; }
+.zen{ position:relative; display:grid; place-items:center;
+  min-height:min(62svh,32rem); text-align:center; }
+
+/* Vòng tròn một nét nay do canvas vẽ (xem drawEnso trong scene.js).
+   Bản SVG trước đây tính ra đúng mọi thuộc tính nhưng không hiện: nó nằm
+   trong lớp bị GSAP ghim và biến đổi, compositor của Chromium không vẽ lại
+   khi stroke-dashoffset đổi. Vẽ lên canvas vừa hết lỗi, vừa cho nét bút
+   thật và soi được xuống mặt nước. */
+
+.zen__w{ position:relative; z-index:1; margin:0;
+  font-family:var(--serif); font-weight:200; color:var(--tram);
+  font-size:clamp(3.2rem,13vw,7.6rem); line-height:.96; letter-spacing:.02em; }
+.zen__w .ln{ display:block; overflow:hidden;
+  padding-top:.14em; margin-top:-.14em; padding-bottom:.08em; margin-bottom:-.08em; }
+.zen__w em{ font-style:italic; font-weight:200; color:var(--son); }
+
+/* chấm son thay cho con dấu */
+.zen__seal{ position:absolute; z-index:1; width:7px; height:7px; border-radius:50%;
+  background:var(--son); opacity:0;
+  top:calc(50% + min(24svh,13rem)); left:50%; transform:translateX(-50%) scale(.2);
+  transition:opacity 1.2s var(--ease) 2s, transform 1.2s var(--ease) 2s; }
+html.ready .zen__seal,
+html.no-stage .zen__seal{ opacity:.8; transform:translateX(-50%) scale(1); }
+
+@media(prefers-reduced-motion:reduce){
+  .zen__seal{ opacity:.8; transform:translateX(-50%); transition:none; }
+}
+
 .act__line{
   font-family:var(--serif); font-weight:300; margin:0;
   font-size:clamp(2.4rem,7vw,6rem); line-height:1.08; letter-spacing:-.028em;

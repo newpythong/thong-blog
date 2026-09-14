@@ -1,1 +1,10 @@
-[]
+[
+  {
+    "slug": "tap-viet",
+    "title": "Tập Viết",
+    "date": "2026-09-14",
+    "tag": "Vu vơ",
+    "excerpt": "Nếu không viết, sợ rằng một ngày sẽ quên hết...",
+    "draft": false
+  }
+]

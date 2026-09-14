@@ -147,10 +147,10 @@
     const acts = [...stage.querySelectorAll('.act')];
     const cue = stage.querySelector('.scrollcue');
     const N = acts.length;
-    /* Độ dài đoạn ghim đi theo số hồi của CẢNH, không theo số khối chữ —
-       chữ đã bỏ gần hết, nhưng bốn linh thú vẫn cần chừng ấy quãng cuộn
-       để lần lượt hiện ra. */
-    const CANH = Math.max(2, (scene && scene.acts) || 4);
+    /* Đoạn ghim chỉ dài hơn một màn hình một chút: cảnh vật đổi màu theo
+       cuộn, không còn nhân vật nào phải chờ tới lượt, nên kéo dài nữa chỉ
+       làm người đọc mỏi tay. */
+    const DAI_GHIM = 1.2;
 
     if (!hasGSAP || RM) {
       /* không có thư viện hoặc người dùng tắt chuyển động:
@@ -173,7 +173,7 @@
         scrollTrigger: {
           trigger: stage,
           start: 'top top',
-          end: () => '+=' + (innerHeight * (CANH - 1) * 1.15),
+          end: () => '+=' + (innerHeight * DAI_GHIM),
           pin: inner,
           pinSpacing: true,
           scrub: 1.1,

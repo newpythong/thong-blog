@@ -147,6 +147,10 @@
     const acts = [...stage.querySelectorAll('.act')];
     const cue = stage.querySelector('.scrollcue');
     const N = acts.length;
+    /* Độ dài đoạn ghim đi theo số hồi của CẢNH, không theo số khối chữ —
+       chữ đã bỏ gần hết, nhưng bốn linh thú vẫn cần chừng ấy quãng cuộn
+       để lần lượt hiện ra. */
+    const CANH = Math.max(2, (scene && scene.acts) || 4);
 
     if (!hasGSAP || RM) {
       /* không có thư viện hoặc người dùng tắt chuyển động:
@@ -169,7 +173,7 @@
         scrollTrigger: {
           trigger: stage,
           start: 'top top',
-          end: () => '+=' + (innerHeight * (N - 1) * 1.15),
+          end: () => '+=' + (innerHeight * (CANH - 1) * 1.15),
           pin: inner,
           pinSpacing: true,
           scrub: 1.1,
@@ -183,8 +187,8 @@
       });
 
       /* mỗi hồi chiếm một đoạn bằng nhau trên dòng thời gian */
-      const seg = 1 / (N - 1);
-      acts.forEach((el, i) => {
+      const seg = 1 / Math.max(1, N - 1);
+      if (N > 1) acts.forEach((el, i) => {
         const words = el.querySelectorAll('.rv-w > i');
         const sub = el.querySelector('.act__sub');
         const meta = el.querySelector('.act__meta');
@@ -211,7 +215,17 @@
         }
       });
 
-      if (cue) tl.to(cue, { opacity: 0, duration: seg * 0.4 }, 0);
+      /* chỉ còn màn mở đầu: chữ lui đi sớm để nhường sân cho linh thú */
+      if (N === 1) {
+        /* dòng thời gian tự lấy độ dài theo nội dung; chỉ có một hai tween
+           ngắn thì cả quãng cuộn ánh vào chừng ba phần mười giây, chữ mở
+           đầu không bao giờ lui hết. Căng một tween rỗng cho đủ một đơn vị. */
+        tl.to({}, { duration: 1 }, 0)
+          .to(acts[0], { opacity: 0, y: -46, duration: .14, ease: 'power2.in' }, .16)
+          .set(acts[0], { visibility: 'hidden' }, .30);
+      }
+
+      if (cue) tl.to(cue, { opacity: 0, duration: .14 }, 0);
 
       /* cửa sổ đổi cỡ thì đo lại, nếu không điểm ghim lệch */
       addEventListener('resize', () => ScrollTrigger.refresh(), { passive: true });

@@ -513,3 +513,11 @@ textarea.inp{ font-family:var(--mono); line-height:1.75; resize:vertical; }
 @media (prefers-reduced-motion:reduce){
   .stream::after{ animation:none; transform:none; opacity:.5; }
 }
+
+/* nút mở thêm bài ở trang chủ */
+.them{ display:block; width:100%; margin:0; padding:1.5rem 0;
+  background:none; border:0; border-bottom:1px solid var(--rule);
+  font-family:var(--mono); font-size:.68rem; letter-spacing:.22em; text-transform:uppercase;
+  color:var(--muc-3); cursor:pointer; text-align:left;
+  transition:color .3s var(--ease); }
+.them:hover{ color:var(--accent); }

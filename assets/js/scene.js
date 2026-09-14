@@ -317,88 +317,755 @@ window.SONTHUY = (() => {
       }
     };
 
-    /* ══ NGỌC — khối cầu ══
-       Một vật thể ba chiều bóng loáng đứng giữa nền phẳng: tô cầu bằng
-       gradient lệch về phía mặt trời, thêm chấm sáng phản chiếu, viền hắt
-       sáng ở rìa tối, rồi quầng nở phía sau. Vẽ vào canvas trên mặt nước
-       nên nó tự có bóng soi xuống. */
-    const drawNgoc = (a, s, waterY) => {
-      /* Màn hẹp thì chữ chiếm gần hết bề ngang: đưa cầu lên cao, nhỏ lại và
-         lùi vào trong, nếu không nó nằm đè lên chữ ở mé nước. */
+    /* ══ LINH THÚ ══
+       Bốn vị thay chỗ khối cầu. Huyền Vũ giữ vai chính, hiện từ hồi mở
+       đầu; Thanh Long, Chu Tước, Bạch Hổ lần lượt hiện ra theo tiến độ
+       cuộn, hai vị kề nhau chỉ chồng mép một quãng ngắn nên không lúc nào
+       thấy hai con đè lên nhau. Tất cả vẽ vào canvas trên mặt nước nên
+       đều tự có bóng soi.
+
+       Thân dựng bằng "dải ống": tô một lượt tối suốt bề ngang, rồi chồng
+       các lượt hẹp dần lệch về phía sáng, cuối cùng một vệt chói mảnh và
+       một viền hắt ở mép tối. Bấy nhiêu đủ để một nét phẳng đọc ra khối
+       tròn, mà rẻ hơn nhiều so với dựng hình thật. */
+
+    const ha = (h, al) => rgba(hex(h), al);
+    const pha = (a, b, u) => rgbHex(mixHex(a, b, clamp(u, 0, 1)));
+
+    const hien = (c, w) => {
+      const d = Math.abs(p - c) / w;
+      if (d >= 1) return 0;
+      const q = 1 - d * d;
+      return q * q;
+    };
+
+    /* pháp tuyến tại từng điểm trên đường tâm */
+    const phapTuyen = P => {
+      const n = P.length, N = [];
+      for (let i = 0; i < n; i++) {
+        const A = P[Math.max(0, i - 1)], B = P[Math.min(n - 1, i + 1)];
+        const tx = B[0] - A[0], ty = B[1] - A[1];
+        const d = Math.hypot(tx, ty) || 1;
+        N.push([-ty / d, tx / d]);
+      }
+      return N;
+    };
+
+    /* một dải dọc đường tâm: k phần bề ngang giữ lại, sh độ lệch về phía sáng */
+    const dai = (a, P, N, wf, k, sh) => {
+      const n = P.length, A = [], B = [];
+      for (let i = 0; i < n; i++) {
+        const w = wf(i / (n - 1)), nx = N[i][0], ny = N[i][1];
+        const cx = P[i][0] - nx * sh * w, cy = P[i][1] - ny * sh * w;
+        A.push([cx + nx * w * k, cy + ny * w * k]);
+        B.push([cx - nx * w * k, cy - ny * w * k]);
+      }
+      a.beginPath();
+      A.forEach((q, i) => i ? a.lineTo(q[0], q[1]) : a.moveTo(q[0], q[1]));
+      for (let i = n - 1; i >= 0; i--) a.lineTo(B[i][0], B[i][1]);
+      a.closePath();
+    };
+
+    /* thân ống — c = [tối, giữa, sáng, chói, viền hắt] */
+    const ong = (a, P, wf, c) => {
+      const N = phapTuyen(P);
+      a.lineJoin = 'round';
+      dai(a, P, N, wf, 1, 0); a.fillStyle = c[0]; a.fill();
+      if (c[4]) { dai(a, P, N, wf, .20, -.78); a.fillStyle = c[4]; a.fill(); }
+      dai(a, P, N, wf, .80, .19); a.fillStyle = c[1]; a.fill();
+      dai(a, P, N, wf, .44, .45); a.fillStyle = c[2]; a.fill();
+      if (c[3]) { dai(a, P, N, wf, .13, .64); a.fillStyle = c[3]; a.fill(); }
+    };
+
+    /* cung bậc hai: từ A tới B, phình ra bow theo phương vuông góc */
+    const cung = (ax, ay, bx, by, bow, n) => {
+      const mx = (ax + bx) / 2, my = (ay + by) / 2;
+      const dx = bx - ax, dy = by - ay, d = Math.hypot(dx, dy) || 1;
+      const cx = mx - dy / d * bow, cy = my + dx / d * bow, P = [];
+      for (let i = 0; i <= n; i++) {
+        const u = i / n, v = 1 - u;
+        P.push([v * v * ax + 2 * v * u * cx + u * u * bx,
+                v * v * ay + 2 * v * u * cy + u * u * by]);
+      }
+      return P;
+    };
+
+    /* quầng nở — ai cũng cần một quầng để tách khỏi nền */
+    const quang = (a, x, y, r, c1, a1, c2, a2) => {
+      const g = a.createRadialGradient(x, y, r * .16, x, y, r);
+      g.addColorStop(0, ha(c1, a1));
+      g.addColorStop(.42, ha(c2, a2));
+      g.addColorStop(1, ha(c2, 0));
+      a.fillStyle = g;
+      a.beginPath(); a.arc(x, y, r, 0, 6.2832); a.fill();
+    };
+
+    /* ─── HUYỀN VŨ ───
+       Rắn quấn quanh mai rùa. Mai là một chỏm cầu chia ô giáp: mỗi ô tự
+       nhận sáng theo pháp tuyến riêng của nó, nên khối nổi lên thật chứ
+       không phải chỉ một vòng gradient. Rắn vòng ra sau mai rồi trở lại
+       trước, ngóc đầu lên trên. */
+    const veHuyenVu = (a, s, waterY, k) => {
       const hep = W < 760;
-      const R = Math.min(W, H) * (hep ? .082 : .105 + s.dolly * .022);
-      const bob = Math.sin(t * .16) * H * .012;
-      const ox = W * (hep ? .70 : .755 - s.dolly * .04);
-      const oy = (hep ? H * .20 + R : waterY - R * 1.45) + bob;
+      const R = Math.min(W, H) * (hep ? .105 : .148) * (.88 + .12 * k);
+      const Rx = R, Ry = R * .80;
+      const ox = W * (hep ? .70 : .745);
+      const oy = (hep ? H * .24 + R : waterY - R * .72) + Math.sin(t * .15) * H * .008;
 
-      /* hướng sáng lấy từ mặt trời để mọi thứ cùng một nguồn */
-      const lx = W * s.sunX - ox, ly = H * s.sunY - oy;
-      const ld = Math.max(1, Math.hypot(lx, ly));
-      const ux = lx / ld, uy = ly / ld;
+      let lx = W * s.sunX - ox, ly = H * s.sunY - oy;
+      const l2 = Math.max(1, Math.hypot(lx, ly));
+      lx /= l2; ly /= l2;
+      const l3 = Math.hypot(1, .78);
+      const Lx = lx / l3, Ly = ly / l3, Lz = .78 / l3;
 
-      const sang = lift(s.ember, .35);
-      const toi = s.ink;
+      /* mai ngả lục ngọc, rắn ngả tím — hai sắc phải cách nhau đủ xa thì
+         mới đọc ra hai vật, cùng tông thì rắn chỉ còn là cái viền của mai */
+      const TOI = '#06202c', SANG = '#39d9c0', NGU = '#2f7fd8';
+      const RAN = [ha('#1c0733', .96), ha('#5d259b', .96), ha('#c46cf0', .96),
+                   ha('#ffe4ff', .8), ha('#ff8ae0', .22)];
 
-      /* quầng nở */
-      const bloom = a.createRadialGradient(ox, oy, R * .7, ox, oy, R * 3.1);
-      bloom.addColorStop(0, rgba(sang, .22));
-      bloom.addColorStop(.45, rgba(sang, .07));
-      bloom.addColorStop(1, rgba(sang, 0));
-      a.fillStyle = bloom;
-      a.beginPath(); a.arc(ox, oy, R * 3.1, 0, 6.2832); a.fill();
+      quang(a, ox, oy, R * 3, SANG, .18, '#7b3fd6', .12);
 
-      /* thân cầu: sáng dồn về phía nguồn sáng, tối dần sang bên kia */
-      const body = a.createRadialGradient(
-        ox + ux * R * .42, oy + uy * R * .42, R * .05,
-        ox, oy, R * 1.04);
-      body.addColorStop(0, rgba(lift(s.ember, .62), .98));
-      body.addColorStop(.30, rgba(s.ember, .96));
-      body.addColorStop(.66, rgba(mixHex(rgbHex(s.ember), rgbHex(toi), .55), .95));
-      body.addColorStop(1, rgba(toi, .93));
-      a.fillStyle = body;
-      a.beginPath(); a.arc(ox, oy, R, 0, 6.2832); a.fill();
+      /* Đường tâm rắn gồm ba đoạn: chóp đuôi ló ra ở vai trái, vành đai
+         quấn ngang mai, rồi cổ ngóc lên trước mai. Vành đai phải dẹt hơn
+         mai — dẹt thì nửa trên chui vào trong bóng mai và bị mai che, mới
+         ra cái quấn; bằng hoặc to hơn mai thì chỉ còn là cái vòng đeo
+         quanh, không ai đọc ra con rắn. */
+      const MD = 10, MC = 34, MN = 14, MT = MD + MC + MN;
+      const DAI = 1.16, CAO = .55, HA = .25;          // bán trục và độ hạ của đai
+      const gOf = u => Math.PI * (1.34 - 1.24 * u);
+      const dOf = u => {
+        const g = gOf(u), sw = Math.sin(t * .5 + u * 5) * R * .012;
+        return [ox + Math.cos(g) * Rx * DAI + sw, oy + (HA + Math.sin(g) * CAO) * Ry + sw * .4];
+      };
 
-      /* viền hắt sáng ở rìa tối — mẹo cũ để khối tách khỏi nền */
+      const SP = [], SU = [];
+      const d0 = dOf(0);
+      const duoi = cung(ox - Rx * 1.10, oy - Ry * (.98 + Math.sin(t * .34) * .05),
+                        d0[0], d0[1], -R * .30, MD);
+      duoi.forEach((q, i) => { SP.push(q); SU.push(i / MT); });
+      for (let i = 1; i <= MC; i++) { SP.push(dOf(i / MC)); SU.push((MD + i) / MT); }
+      const dn = SP[MD + MC];
+      const co = cung(dn[0], dn[1], ox + Rx * .34,
+                      oy - Ry * (1.30 + Math.sin(t * .3) * .05), R * .40, MN);
+      for (let i = 1; i <= MN; i++) { SP.push(co[i]); SU.push((MD + MC + i) / MT); }
+
+      const swf = u => R * (.006 + .118 * Math.sin(Math.PI * clamp(.02 + u * .84, 0, 1)));
+      const khuc = (i0, i1) => ong(a, SP.slice(i0, i1 + 1),
+        lu => swf(SU[i0] + lu * (SU[i1] - SU[i0])), RAN);
+
+      /* cắt đúng chỗ đai đi qua mép trái của mai — từ đó trở đi là nửa trước */
+      const cat = MD + Math.round(MC * .274);
+      khuc(0, cat);                                   // đuôi và nửa khuất sau mai
+
+      /* ── mai rùa ── */
+      const pt3 = (u, v) => {
+        const f = Math.sin(v * 1.5708);
+        return [ox + Math.cos(u) * f * Rx, oy + Math.sin(u) * f * Ry];
+      };
+      const sacO = (uc, vc) => {
+        const ph = vc * 1.5708;
+        const nx = Math.cos(uc) * Math.sin(ph), ny = Math.sin(uc) * Math.sin(ph), nz = Math.cos(ph);
+        const lam = clamp(nx * Lx + ny * Ly + nz * Lz, 0, 1);
+        return [pha(pha(TOI, SANG, Math.pow(lam, 1.3)), NGU, Math.pow(1 - nz, 2.4) * .5), lam];
+      };
+
       a.save();
-      a.beginPath(); a.arc(ox, oy, R, 0, 6.2832); a.clip();
-      const rim = a.createRadialGradient(
-        ox - ux * R * .72, oy - uy * R * .72, R * .3,
-        ox - ux * R * .72, oy - uy * R * .72, R * 1.25);
-      rim.addColorStop(0, rgba(lift(s.ember, .5), 0));
-      rim.addColorStop(.72, rgba(lift(s.ember, .5), 0));
-      rim.addColorStop(.93, rgba(lift(s.ember, .75), .5));
-      rim.addColorStop(1, rgba(lift(s.ember, .8), .16));
-      a.fillStyle = rim;
-      a.fillRect(ox - R, oy - R, R * 2, R * 2);
+      a.beginPath(); a.ellipse(ox, oy, Rx, Ry, 0, 0, 6.2832); a.clip();
 
-      /* ánh nước hắt ngược lên đáy cầu — thiếu nó khối bị bẹt */
-      const bx = ox - ux * R * .3, by = oy + R * .74;
-      const bounce = a.createRadialGradient(bx, by, 0, bx, by, R * .95);
-      bounce.addColorStop(0, rgba(lift(s.water[3], .2), .34));
-      bounce.addColorStop(.55, rgba(lift(s.water[2], .1), .10));
-      bounce.addColorStop(1, rgba(s.water[1], 0));
-      a.fillStyle = bounce;
-      a.fillRect(ox - R, oy - R, R * 2, R * 2);
+      const nen = a.createRadialGradient(ox + Lx * Rx * .5, oy + Ly * Ry * .5, R * .05,
+                                         ox, oy, R * 1.08);
+      nen.addColorStop(0, ha('#2d6f88', .98));
+      nen.addColorStop(.55, ha('#122b48', .98));
+      nen.addColorStop(1, ha(TOI, .98));
+      a.fillStyle = nen; a.fillRect(ox - Rx, oy - Ry, Rx * 2, Ry * 2);
+
+      const K = 8;
+      /* v tính ngược từ bán kính trên màn: chia đều theo góc cực thì ô giữa
+         phình ra như mâm xe còn vành ngoài mỏng dính */
+      const vOf = r => Math.asin(clamp(r, 0, 1)) / 1.5708;
+
+      /* ô đỉnh — sáu cạnh, để cả mai đọc ra hình lục giác */
+      const dinh = sacO(0, .10);
+      a.beginPath();
+      for (let q = 0; q < 6; q++) {
+        const P0 = pt3(q / 6 * 6.2832 + .52, vOf(.33));
+        q ? a.lineTo(P0[0], P0[1]) : a.moveTo(P0[0], P0[1]);
+      }
+      a.closePath();
+      a.fillStyle = ha(dinh[0], .97); a.fill();
+
+      const VONG = [[vOf(.355), vOf(.70), 6, .5], [vOf(.72), 1, 13, 0]];
+      VONG.forEach(v => {
+        const v0 = v[0], v1 = v[1], n = v[2], off = v[3];
+        const du = 6.2832 / n, iv = (v1 - v0) * .09, iu = du * .07;
+        for (let j = 0; j < n; j++) {
+          const u0 = (j + off) * du + iu, u1 = (j + 1 + off) * du - iu;
+          const a0 = v0 + iv, a1 = v1 - iv;
+          const r = sacO((u0 + u1) * .5, (a0 + a1) * .5);
+          r[0] = pha(r[0], '#ffffff', (frac(j * 3.7 + v0 * 11) - .5) * .14);
+          a.beginPath();
+          for (let q = 0; q <= K; q++) { const P0 = pt3(mix(u0, u1, q / K), a0); q ? a.lineTo(P0[0], P0[1]) : a.moveTo(P0[0], P0[1]); }
+          for (let q = 1; q <= K; q++) { const P0 = pt3(u1, mix(a0, a1, q / K)); a.lineTo(P0[0], P0[1]); }
+          for (let q = K - 1; q >= 0; q--) { const P0 = pt3(mix(u0, u1, q / K), a1); a.lineTo(P0[0], P0[1]); }
+          for (let q = K - 1; q >= 1; q--) { const P0 = pt3(u0, mix(a0, a1, q / K)); a.lineTo(P0[0], P0[1]); }
+          a.closePath();
+          a.fillStyle = ha(r[0], .97); a.fill();
+          if (r[1] > .55) {
+            a.strokeStyle = rgba(lift(hex(r[0]), .55), (r[1] - .55) * .8);
+            a.lineWidth = Math.max(.6, R * .007); a.stroke();
+          }
+        }
+      });
+
+      /* viền hắt sáng ở rìa tối, ánh nước dội lên đáy mai */
+      const rim = a.createRadialGradient(ox - Lx * Rx * .7, oy - Ly * Ry * .7, R * .3,
+                                         ox - Lx * Rx * .7, oy - Ly * Ry * .7, R * 1.3);
+      rim.addColorStop(0, ha(NGU, 0));
+      rim.addColorStop(.70, ha(NGU, 0));
+      rim.addColorStop(.92, ha('#a8e8ff', .38));
+      rim.addColorStop(1, ha(NGU, .22));
+      a.fillStyle = rim; a.fillRect(ox - Rx, oy - Ry, Rx * 2, Ry * 2);
+
+      const bx = ox - Lx * Rx * .3, by = oy + Ry * .8;
+      const doi = a.createRadialGradient(bx, by, 0, bx, by, R * .95);
+      doi.addColorStop(0, rgba(lift(s.water[3], .2), .30));
+      doi.addColorStop(1, rgba(s.water[1], 0));
+      a.fillStyle = doi; a.fillRect(ox - Rx, oy - Ry, Rx * 2, Ry * 2);
       a.restore();
 
-      /* chấm sáng phản chiếu — hai lớp, một lõi đặc một quầng mềm */
-      const hx = ox + ux * R * .52, hy = oy + uy * R * .52;
-      const spec = a.createRadialGradient(hx, hy, 0, hx, hy, R * .40);
-      spec.addColorStop(0, 'rgba(255,253,247,.92)');
-      spec.addColorStop(.35, 'rgba(255,250,236,.34)');
-      spec.addColorStop(1, 'rgba(255,250,236,0)');
-      a.fillStyle = spec;
-      a.beginPath(); a.arc(hx, hy, R * .40, 0, 6.2832); a.fill();
-      a.fillStyle = 'rgba(255,255,252,.85)';
-      a.beginPath(); a.ellipse(hx, hy, R * .085, R * .062, -.5, 0, 6.2832); a.fill();
+      /* chấm sáng phản chiếu trên lớp men */
+      const hx0 = ox + Lx * Rx * .48, hy0 = oy + Ly * Ry * .48;
+      const chm = a.createRadialGradient(hx0, hy0, 0, hx0, hy0, R * .42);
+      chm.addColorStop(0, 'rgba(255,255,255,.78)');
+      chm.addColorStop(.32, 'rgba(226,250,255,.22)');
+      chm.addColorStop(1, 'rgba(226,250,255,0)');
+      a.fillStyle = chm;
+      a.beginPath(); a.arc(hx0, hy0, R * .42, 0, 6.2832); a.fill();
+      a.fillStyle = 'rgba(255,255,255,.8)';
+      a.beginPath(); a.ellipse(hx0, hy0, R * .07, R * .046, -.5, 0, 6.2832); a.fill();
 
-      /* bóng đổ mềm trên mặt nước, ngay dưới chân cầu */
-      if (hep) return;                     // ở xa mặt nước thì không còn bóng tiếp xúc
-      const sh = a.createRadialGradient(ox, waterY, 0, ox, waterY, R * 1.5);
-      sh.addColorStop(0, rgba(toi, .18));
-      sh.addColorStop(1, rgba(toi, 0));
+      khuc(cat - 1, MT);                              // nửa trước, đè lên mai
+
+      /* đầu rắn */
+      const hX = SP[MT][0], hY = SP[MT][1];
+      let tx = SP[MT][0] - SP[MT - 2][0], ty = SP[MT][1] - SP[MT - 2][1];
+      const td = Math.hypot(tx, ty) || 1; tx /= td; ty /= td;
+      const hr = R * .19;
+      a.save();
+      a.translate(hX + tx * hr * .3, hY + ty * hr * .3);
+      a.rotate(Math.atan2(ty, tx));
+      a.beginPath();
+      a.moveTo(hr * 1.55, 0);
+      a.quadraticCurveTo(hr * .5, -hr, -hr * .95, -hr * .6);
+      a.quadraticCurveTo(-hr * 1.35, 0, -hr * .95, hr * .6);
+      a.quadraticCurveTo(hr * .5, hr, hr * 1.55, 0);
+      a.closePath();
+      const hg = a.createLinearGradient(0, -hr, 0, hr);
+      hg.addColorStop(0, ha('#e6a8ff', .97));
+      hg.addColorStop(.5, ha('#5d259b', .97));
+      hg.addColorStop(1, ha('#1c0733', .97));
+      a.fillStyle = hg; a.fill();
+      a.beginPath(); a.arc(hr * .45, -hr * .3, hr * .2, 0, 6.2832);
+      a.fillStyle = ha('#ffe4a0', .95); a.fill();
+      a.beginPath(); a.arc(hr * .49, -hr * .3, hr * .08, 0, 6.2832);
+      a.fillStyle = 'rgba(8,12,22,.92)'; a.fill();
+      a.beginPath();
+      a.moveTo(hr * 1.5, 0); a.lineTo(hr * 2.5, -hr * .24);
+      a.moveTo(hr * 1.5, 0); a.lineTo(hr * 2.5, hr * .26);
+      a.strokeStyle = ha('#e0614a', .85);
+      a.lineWidth = Math.max(1, hr * .12); a.lineCap = 'round'; a.stroke();
+      a.restore();
+
+      /* bóng đổ trên mặt nước */
+      if (hep) return;
+      const sh = a.createRadialGradient(ox, waterY, 0, ox, waterY, R * 1.7);
+      sh.addColorStop(0, ha(TOI, .20));
+      sh.addColorStop(1, ha(TOI, 0));
       a.fillStyle = sh;
-      a.beginPath(); a.ellipse(ox, waterY, R * 1.5, R * .3, 0, 0, 6.2832); a.fill();
+      a.beginPath(); a.ellipse(ox, waterY, R * 1.7, R * .32, 0, 0, 6.2832); a.fill();
+    };
+
+    /* ─── THANH LONG ───
+       Thân dài uốn ngang trời, vây chạy dọc sống lưng, vảy hắt sáng, râu
+       bay về sau, ngọc châu cháy trước miệng. */
+    const veThanhLong = (a, s, waterY, k) => {
+      const hep = W < 760;
+      const S = Math.min(W, H) * (hep ? .62 : .86) * (.9 + .1 * k);
+      const M = 60, P = [], U = [];
+      const y0 = H * (hep ? .21 : .27) + (1 - k) * H * .05;
+      const x0 = W * (hep ? -.04 : .12), x1 = W * (hep ? .82 : .86);
+      for (let i = 0; i <= M; i++) {
+        const u = i / M;
+        const amp = 1.15 - u * .70;
+        P.push([mix(x0, x1, u),
+                y0 + Math.sin(u * 5.6 - t * .3) * H * .068 * amp
+                   + Math.sin(u * 2.1 + t * .16) * H * .026 * amp]);
+        U.push(u);
+      }
+      const wf = u => S * (.004 + .038 * Math.sin(Math.PI * clamp(.03 + u * .82, 0, 1)));
+      const N = phapTuyen(P);
+
+      const LUC = [ha('#052e28', .96), ha('#127a5f', .96), ha('#4fdca4', .96),
+                   ha('#e2fff0', .8), ha('#43ffc9', .34)];
+      const VANG = [ha('#4a3510', .95), ha('#9c7a2a', .95), ha('#f0d489', .95),
+                    ha('#fffbe8', .8), 0];
+
+      a.save();
+      a.globalCompositeOperation = 'lighter';
+      dai(a, P, N, wf, 3.2, 0); a.fillStyle = ha('#12ffc0', .05); a.fill();
+      dai(a, P, N, wf, 1.8, 0); a.fillStyle = ha('#0affb0', .045); a.fill();
+      a.restore();
+
+      /* vây lưng */
+      a.beginPath();
+      for (let i = 2; i < M - 5; i += 2) {
+        const w = wf(U[i]), nx = N[i][0], ny = N[i][1];
+        const bx = P[i][0] - nx * w * .75, by = P[i][1] - ny * w * .75;
+        const hg = w * (1.15 + .3 * Math.sin(i * 1.7));
+        a.moveTo(bx - ny * w * .85, by + nx * w * .85);
+        a.lineTo(bx - nx * hg, by - ny * hg);
+        a.lineTo(bx + ny * w * .85, by - nx * w * .85);
+      }
+      a.closePath();
+      a.fillStyle = ha('#8ef2cd', .42); a.fill();
+
+      /* vây đuôi */
+      const tn = N[0];
+      [-1, 1].forEach(sg => {
+        a.beginPath();
+        a.moveTo(P[2][0], P[2][1]);
+        a.quadraticCurveTo(P[0][0] - S * .04 + tn[0] * S * .05 * sg,
+                           P[0][1] + tn[1] * S * .05 * sg,
+                           P[0][0] - S * .085 + tn[0] * S * .075 * sg,
+                           P[0][1] + tn[1] * S * .075 * sg);
+        a.quadraticCurveTo(P[0][0] - S * .02, P[0][1], P[2][0], P[2][1]);
+        a.closePath();
+        a.fillStyle = ha('#6fe8bd', .55); a.fill();
+      });
+
+      ong(a, P, wf, LUC);
+
+      /* vảy */
+      for (let i = 4; i < M - 4; i += 2) {
+        const w = wf(U[i]), nx = N[i][0], ny = N[i][1];
+        const r = w * .3;
+        const cx = P[i][0] - nx * w * .42, cy = P[i][1] - ny * w * .42;
+        a.beginPath();
+        a.ellipse(cx, cy, r * 1.5, r * .8, Math.atan2(-nx, ny), 0, 6.2832);
+        a.fillStyle = ha('#c9ffe6', .2 + .16 * Math.sin(t * .9 + i)); a.fill();
+      }
+
+      /* chân, ba vuốt */
+      const chan = (fu, sgn) => {
+        const i = Math.round(fu * M);
+        const w = wf(U[i]), nx = N[i][0], ny = N[i][1];
+        const bx = P[i][0] + nx * w * .5, by = P[i][1] + ny * w * .5;
+        const ex = bx + S * .055 * sgn, ey = by + S * .075;
+        ong(a, cung(bx, by, ex, ey, S * .022 * sgn, 10), u => w * (.66 - u * .34), LUC);
+        for (let c = -1; c <= 1; c++) {
+          a.beginPath();
+          a.moveTo(ex, ey);
+          a.quadraticCurveTo(ex + c * S * .014, ey + S * .018,
+                             ex + c * S * .02 + sgn * S * .008, ey + S * .03);
+          a.strokeStyle = ha('#f4ffe6', .75);
+          a.lineWidth = Math.max(1, S * .005); a.lineCap = 'round'; a.stroke();
+        }
+      };
+      chan(.56, 1); chan(.80, -1);
+
+      /* đầu */
+      const hX = P[M][0], hY = P[M][1];
+      let tx = P[M][0] - P[M - 2][0], ty = P[M][1] - P[M - 2][1];
+      const td = Math.hypot(tx, ty) || 1; tx /= td; ty /= td;
+      const hr = S * .058;
+      a.save();
+      a.translate(hX, hY);
+      a.rotate(Math.atan2(ty, tx));
+
+      /* bờm */
+      for (let j = 0; j < 4; j++) {
+        const u = j / 3;
+        ong(a, cung(-hr * .4, -hr * .35 + u * hr * .85,
+                    -hr * (1.5 + u * .9), -hr * (1.25 - u * 1.5), hr * .55, 10),
+            uu => hr * .17 * (1 - uu * .85), LUC);
+      }
+      /* sừng */
+      [0, 1].forEach(j => ong(a,
+        cung(-hr * .25, -hr * (.5 - j * .25), -hr * (1.5 + j * .35), -hr * (1.5 - j * .3), hr * .42, 10),
+        u => hr * .13 * (1 - u * .88), VANG));
+      /* sọ */
+      a.beginPath();
+      a.moveTo(hr * 1.85, hr * .14);
+      a.quadraticCurveTo(hr * .8, -hr * 1.0, -hr * .9, -hr * .66);
+      a.quadraticCurveTo(-hr * 1.45, 0, -hr * .85, hr * .7);
+      a.quadraticCurveTo(hr * .4, hr * .95, hr * 1.85, hr * .14);
+      a.closePath();
+      const hgd = a.createLinearGradient(0, -hr, 0, hr);
+      hgd.addColorStop(0, ha('#7cf0bc', .97));
+      hgd.addColorStop(.5, ha('#127a5f', .97));
+      hgd.addColorStop(1, ha('#052e28', .97));
+      a.fillStyle = hgd; a.fill();
+      /* hàm dưới */
+      a.beginPath();
+      a.moveTo(hr * 1.8, hr * .2);
+      a.quadraticCurveTo(hr * .5, hr * 1.05, -hr * .55, hr * .66);
+      a.quadraticCurveTo(hr * .4, hr * .48, hr * 1.8, hr * .2);
+      a.closePath();
+      a.fillStyle = ha('#03211d', .9); a.fill();
+      /* mắt */
+      a.beginPath(); a.arc(hr * .48, -hr * .34, hr * .2, 0, 6.2832);
+      a.fillStyle = ha('#fff0b0', .96); a.fill();
+      a.beginPath(); a.ellipse(hr * .53, -hr * .34, hr * .06, hr * .14, 0, 0, 6.2832);
+      a.fillStyle = 'rgba(4,20,18,.95)'; a.fill();
+      /* râu */
+      [-1, 1].forEach(sg => ong(a,
+        cung(hr * 1.6, hr * .12 * sg, -hr * 2.6,
+             hr * (1.5 * sg + Math.sin(t * .7 + sg) * .6), hr * .85 * sg, 14),
+        u => hr * .085 * (1 - u * .92),
+        [ha('#0a3a30', .75), ha('#2fae86', .75), ha('#b6ffe0', .75), 0, 0]));
+      a.restore();
+
+      /* ngọc châu */
+      const px = hX + tx * S * .15, py = hY + ty * S * .15 - S * .015;
+      const pr = S * .028;
+      a.save();
+      a.globalCompositeOperation = 'lighter';
+      quang(a, px, py, pr * 6, '#fff3c0', .45, '#ffb43a', .16);
+      a.restore();
+      const pg = a.createRadialGradient(px - pr * .3, py - pr * .35, 0, px, py, pr);
+      pg.addColorStop(0, 'rgba(255,255,255,.98)');
+      pg.addColorStop(.5, ha('#ffe08a', .95));
+      pg.addColorStop(1, ha('#e07a18', .9));
+      a.fillStyle = pg;
+      a.beginPath(); a.arc(px, py, pr, 0, 6.2832); a.fill();
+    };
+
+    /* ─── CHU TƯỚC ───
+       Chim lửa nhìn ngang: hai cánh xoè thành quạt lông, đuôi buông dài
+       về sau, ngọn đuôi có đốm sáng. Quầng tô bằng phép cộng sáng nên chỗ
+       lông chồng nhau cháy lên. */
+    const veChuTuoc = (a, s, waterY, k) => {
+      const hep = W < 760;
+      /* dải trời ở hồi này chỉ cao chừng một phần ba màn: chim phải nhỏ và
+         đặt vừa khoảng giữa thanh trên và mé nước, không thì cụt cánh */
+      const S = Math.min(W, H) * (hep ? .17 : .205) * (.86 + .14 * k);
+      const cx = W * (hep ? .63 : .71);
+      const cy = H * (hep ? .25 : .30) + (1 - k) * H * .04;
+      const vo = Math.sin(t * .32);
+
+      const sac = u => [
+        ha(pha('#2b0212', '#8f0f14', u), .96),
+        ha(pha('#a81a0c', '#ff6a12', u), .96),
+        ha(pha('#ff7a1a', '#ffdc6a', u), .96),
+        ha('#fffbe8', .8), ha('#ff3d10', .34)];
+
+      a.save();
+      a.globalCompositeOperation = 'lighter';
+      quang(a, cx, cy, S * 2.4, '#ff9330', .24, '#ff3b0d', .10);
+      a.restore();
+
+      /* cánh: xa trước, gần sau, để thân nằm giữa */
+      const canh = sg => {
+        const shx = cx + sg * S * .08, shy = cy - S * .06;
+        for (let j = 0; j < 8; j++) {
+          const u = j / 7;
+          const th = sg * (.26 + u * 1.20 + vo * .14);
+          const ln = S * (1.02 - u * .38);
+          const ex = shx + Math.sin(th) * ln, ey = shy - Math.cos(th) * ln;
+          ong(a, cung(shx, shy, ex, ey, S * (.13 + u * .16) * sg, 14),
+              uu => S * (.088 - u * .042) * (1 - uu * .66), sac(u * .8 + .1));
+        }
+      };
+
+      a.save(); a.globalAlpha *= .62; canh(-1); a.restore();
+
+      /* đuôi — đổ chéo xuống sau, đủ dốc thì mới không nằm bẹp ở mé nước */
+      for (let j = 0; j < 6; j++) {
+        const u = j / 5;
+        const ang = Math.PI * (.06 + u * .13) + Math.sin(t * .22 + j) * .025;
+        const ln = S * (1.35 + u * .8);
+        const bx = cx - S * .06, by2 = cy + S * .28;
+        const ex = bx - Math.cos(ang) * ln, ey = by2 + Math.sin(ang) * ln;
+        const Pt = cung(bx, by2, ex, ey, S * (.34 - u * .46), 16);
+        ong(a, Pt, uu => S * .05 * (1 - uu * .62) * (1 - u * .2), sac(1 - u * .75));
+        const tip = Pt[Pt.length - 1];
+        a.save();
+        a.globalCompositeOperation = 'lighter';
+        quang(a, tip[0], tip[1], S * .26, '#fff0bc', .5, '#ff7a1a', .2);
+        a.restore();
+        a.beginPath(); a.ellipse(tip[0], tip[1], S * .05, S * .033, ang, 0, 6.2832);
+        a.fillStyle = ha('#ffe9a8', .85); a.fill();
+      }
+
+      /* thân — gradient lệch về phía sáng, thêm viền hắt ở mé tối */
+      const tg = a.createRadialGradient(cx + S * .07, cy - S * .12, S * .02,
+                                        cx, cy + S * .04, S * .36);
+      tg.addColorStop(0, ha('#fff0b4', .98));
+      tg.addColorStop(.3, ha('#ffab2e', .98));
+      tg.addColorStop(.66, ha('#d33c12', .98));
+      tg.addColorStop(1, ha('#48060c', .98));
+      a.save();
+      a.beginPath(); a.ellipse(cx, cy + S * .04, S * .19, S * .32, -.22, 0, 6.2832);
+      a.clip();
+      a.fillStyle = tg; a.fillRect(cx - S * .3, cy - S * .34, S * .6, S * .74);
+      const vg = a.createRadialGradient(cx - S * .12, cy + S * .2, S * .04,
+                                        cx - S * .12, cy + S * .2, S * .3);
+      vg.addColorStop(0, ha('#ff6a12', 0));
+      vg.addColorStop(.68, ha('#ff6a12', 0));
+      vg.addColorStop(1, ha('#ffb05a', .5));
+      a.fillStyle = vg; a.fillRect(cx - S * .3, cy - S * .34, S * .6, S * .74);
+      a.restore();
+
+      /* cổ và đầu */
+      ong(a, cung(cx + S * .05, cy - S * .16, cx + S * .14, cy - S * .46, S * .05, 12),
+          u => S * (.10 - u * .035), sac(.75));
+      const hx = cx + S * .15, hy = cy - S * .50;
+      for (let j = 0; j < 3; j++)
+        ong(a, cung(hx - S * .04, hy - S * .05, hx - S * (.12 + j * .08), hy - S * (.30 - j * .07),
+                    S * .05, 10), u => S * .024 * (1 - u * .82), sac(.9));
+      const hg = a.createRadialGradient(hx - S * .03, hy - S * .04, 0, hx, hy, S * .12);
+      hg.addColorStop(0, 'rgba(255,250,220,.99)');
+      hg.addColorStop(.5, ha('#ff9e2c', .97));
+      hg.addColorStop(1, ha('#8d1a06', .97));
+      a.fillStyle = hg;
+      a.beginPath(); a.ellipse(hx, hy, S * .105, S * .088, -.3, 0, 6.2832); a.fill();
+      a.beginPath();
+      a.moveTo(hx + S * .09, hy - S * .012);
+      a.lineTo(hx + S * .235, hy + S * .028);
+      a.lineTo(hx + S * .085, hy + S * .05);
+      a.closePath();
+      a.fillStyle = ha('#ffcf5c', .96); a.fill();
+      a.beginPath(); a.arc(hx + S * .038, hy - S * .024, S * .02, 0, 6.2832);
+      a.fillStyle = 'rgba(30,6,2,.92)'; a.fill();
+      a.beginPath(); a.arc(hx + S * .044, hy - S * .03, S * .0075, 0, 6.2832);
+      a.fillStyle = 'rgba(255,245,220,.9)'; a.fill();
+
+      canh(1);
+
+      /* tàn lửa rơi khỏi đuôi */
+      a.save();
+      a.globalCompositeOperation = 'lighter';
+      for (let i = 0; i < 20; i++) {
+        const r1 = frac(i * 7.31 + 3.3), r2 = frac(i * 2.19 + 8.7);
+        const li = (t * (.07 + r2 * .1) + r1) % 1;
+        const x = cx - S * (.3 + r1 * 1.6) + Math.sin(t * .8 + i) * S * .07;
+        const y = cy + S * (.5 + r2 * 1.3) + li * S * 1.1;
+        const al = (1 - li) * (1 - li) * (.4 + r2 * .4);
+        a.beginPath(); a.arc(x, y, S * (.006 + r2 * .013) * (1 - li * .4), 0, 6.2832);
+        a.fillStyle = ha('#ffb03a', al); a.fill();
+      }
+      a.restore();
+    };
+
+    /* ─── BẠCH HỔ ───
+       Dáng rình: đầu hạ ngang vai, lưng gồ ở vai và ở mông. Đầu vẽ sau
+       thân và đè lên ức nên dính liền vào mình — vẽ rời ra thì thành cái
+       đầu lơ lửng. Thân là đường bao kín chứ không phải ống đều bề ngang;
+       vằn cắt theo đường bao nên uốn đúng khối. */
+    const veBachHo = (a, s, waterY, k) => {
+      const hep = W < 760;
+      const S = Math.min(W, H) * (hep ? .17 : .225) * (.88 + .12 * k);
+      /* màn hẹp: lùi vào trong, không thì cái đuôi vắt ra ngoài mép phải */
+      const cx = W * (hep ? .55 : .73);
+      const gy = (hep ? H * .40 : waterY - H * .022) + (1 - k) * H * .03;
+      const by = gy - S * .74;                        // đường sống lưng
+      const xv = cx - S * .44, xm = cx + S * .54;     // ức → mông
+
+      const TRANG = [ha('#7f8ea9', .97), ha('#d6e2f2', .97), ha('#ffffff', .97),
+                     ha('#ffffff', .72), ha('#a97dff', .42)];
+      const VAN = [ha('#0b1222', .92), ha('#18243d', .92), ha('#2f4272', .8), 0, 0];
+
+      quang(a, cx, by + S * .05, S * 2, '#bfe6ff', .2, '#a06bff', .1);
+
+      /* đuôi */
+      ong(a, cung(xm + S * .06, by + S * .10, xm + S * .70,
+                  by - S * (.52 + Math.sin(t * .35) * .1), -S * .40, 18),
+          u => S * .056 * (1 - u * .74), TRANG);
+
+      const chan = (x0, x1, w0, bow, mo) => {
+        a.save(); if (mo) a.globalAlpha *= .7;
+        ong(a, cung(x0, by + S * .18, x1, gy - S * .03, bow, 14),
+            u => S * w0 * (1 - u * .46), TRANG);
+        a.beginPath();
+        a.ellipse(x1, gy - S * .015, S * w0 * 1.05, S * .04, 0, 0, 6.2832);
+        a.fillStyle = ha('#eef3fb', .96); a.fill();
+        a.restore();
+      };
+      chan(xm - S * .20, xm - S * .10, .08, S * .08, 1);      // sau, xa
+      chan(xv + S * .20, xv + S * .30, .07, -S * .06, 1);     // trước, xa
+
+      /* khối mông và khối vai: thiếu hai khối này thân chỉ là một cái ống */
+      const khoi = (x, y, rx, ry) => {
+        const g = a.createRadialGradient(x - rx * .3, y - ry * .45, ry * .05, x, y, rx * 1.2);
+        g.addColorStop(0, ha('#ffffff', .99));
+        g.addColorStop(.5, ha('#dae5f4', .99));
+        g.addColorStop(1, ha('#6d7c99', .99));
+        a.fillStyle = g;
+        a.beginPath(); a.ellipse(x, y, rx, ry, 0, 0, 6.2832); a.fill();
+      };
+      khoi(xm - S * .06, by + S * .1, S * .3, S * .27);
+
+      /* thân */
+      const than = () => {
+        a.beginPath();
+        a.moveTo(xv - S * .04, by + S * .08);
+        a.bezierCurveTo(xv + S * .02, by - S * .16, cx - S * .10, by - S * .20,
+                        cx + S * .14, by - S * .15);
+        a.bezierCurveTo(xm + S * .04, by - S * .12, xm + S * .20, by + S * .08,
+                        xm + S * .10, by + S * .28);
+        a.bezierCurveTo(xm - S * .06, by + S * .42, cx - S * .08, by + S * .40,
+                        xv + S * .02, by + S * .32);
+        a.bezierCurveTo(xv - S * .18, by + S * .28, xv - S * .20, by + S * .16,
+                        xv - S * .04, by + S * .08);
+        a.closePath();
+      };
+      than();
+      const bg = a.createLinearGradient(0, by - S * .22, 0, by + S * .42);
+      bg.addColorStop(0, ha('#ffffff', .99));
+      bg.addColorStop(.44, ha('#dae5f4', .99));
+      bg.addColorStop(1, ha('#677695', .99));
+      a.fillStyle = bg; a.fill();
+      khoi(xv + S * .14, by + S * .04, S * .26, S * .24);
+
+      /* vằn vót nhọn từ sống lưng đổ xuống, dài ngắn không đều — vằn chạy
+         suốt bề cao và đều tăm tắp thì ra con ngựa vằn */
+      a.save();
+      than(); a.clip();
+      for (let j = 0; j < 9; j++) {
+        const u = j / 8;
+        const x = mix(xv + S * .06, xm + S * .04, u);
+        const ngh = S * (.10 + frac(j * 5.7 + 1.1) * .11);
+        const bot = by + S * (.02 + frac(j * 3.1 + 4.2) * .22);
+        const Pv = cung(x + ngh, by - S * .24, x - ngh * .35, bot,
+                        S * .05 * (j % 2 ? 1 : -1), 10);
+        ong(a, Pv, uu => S * (.034 - .031 * uu) * (j % 2 ? 1 : .82), VAN);
+      }
+      /* viền ngũ sắc: chỉ hắt ở sống lưng và mé bụng, không phủ cả thân */
+      const ng = a.createLinearGradient(0, by - S * .24, 0, by - S * .02);
+      ng.addColorStop(0, ha('#a97dff', .6));
+      ng.addColorStop(1, ha('#a97dff', 0));
+      a.fillStyle = ng; a.fillRect(xv - S * .3, by - S * .3, S * 1.7, S * .32);
+      const ng2 = a.createLinearGradient(0, by + S * .14, 0, by + S * .42);
+      ng2.addColorStop(0, ha('#4fd8ff', 0));
+      ng2.addColorStop(1, ha('#4fd8ff', .5));
+      a.fillStyle = ng2; a.fillRect(xv - S * .3, by + S * .1, S * 1.7, S * .36);
+      a.restore();
+
+      chan(xm - S * .08, xm + S * .06, .095, S * .09, 0);     // sau, gần
+      chan(xv + S * .08, xv + S * .14, .085, -S * .07, 0);    // trước, gần
+
+      /* đầu — hạ ngang vai, đè lên ức */
+      const hx = xv - S * .28, hy = by + S * .06, hr = S * .27;
+      [-1, 1].forEach(sg => {                                  // tai
+        const ex = hx + sg * hr * .58 + hr * .18, ey = hy - hr * .84;
+        a.beginPath();
+        a.moveTo(ex - hr * .36, ey + hr * .2);
+        a.quadraticCurveTo(ex - hr * .2, ey - hr * .78, ex + hr * .36, ey - hr * .26);
+        a.quadraticCurveTo(ex + hr * .4, ey + hr * .22, ex - hr * .36, ey + hr * .2);
+        a.closePath();
+        a.fillStyle = ha('#e4ecf8', .97); a.fill();
+        a.beginPath();
+        a.moveTo(ex - hr * .2, ey + hr * .12);
+        a.quadraticCurveTo(ex - hr * .08, ey - hr * .44, ex + hr * .21, ey - hr * .14);
+        a.quadraticCurveTo(ex + hr * .22, ey + hr * .12, ex - hr * .2, ey + hr * .12);
+        a.closePath();
+        a.fillStyle = ha('#3d2a4c', .62); a.fill();
+      });
+      /* lông má: một hàng túm nhọn chạy vòng mé dưới mặt. Má tròn vành
+         vạnh thì ra con mèo, nên phải có chỗ gãy */
+      for (let j = 0; j < 6; j++) {
+        const ang = 2.05 + j / 5 * 1.85;              // từ dưới-trái vòng xuống dưới-phải
+        const r0 = hr * .9, r1 = hr * (1.2 + .12 * Math.sin(j * 2.1));
+        a.beginPath();
+        a.moveTo(hx + Math.cos(ang - .22) * hr * 1.06, hy + Math.sin(ang - .22) * r0);
+        a.lineTo(hx + Math.cos(ang) * hr * 1.32, hy + Math.sin(ang) * r1);
+        a.lineTo(hx + Math.cos(ang + .22) * hr * 1.06, hy + Math.sin(ang + .22) * r0);
+        a.closePath();
+        a.fillStyle = ha('#eef4fc', .95); a.fill();
+      }
+      const hgt = a.createRadialGradient(hx - hr * .3, hy - hr * .4, hr * .05, hx, hy, hr * 1.3);
+      hgt.addColorStop(0, 'rgba(255,255,255,.99)');
+      hgt.addColorStop(.5, ha('#dce7f7', .99));
+      hgt.addColorStop(1, ha('#6d7c99', .99));
+      a.fillStyle = hgt;
+      a.beginPath(); a.ellipse(hx, hy, hr * 1.14, hr * .92, 0, 0, 6.2832); a.fill();
+      /* mõm, mũi */
+      a.beginPath(); a.ellipse(hx - hr * .5, hy + hr * .34, hr * .44, hr * .32, -.16, 0, 6.2832);
+      a.fillStyle = 'rgba(255,255,255,.97)'; a.fill();
+      a.beginPath();
+      a.moveTo(hx - hr * .86, hy + hr * .14);
+      a.lineTo(hx - hr * .62, hy + hr * .12);
+      a.lineTo(hx - hr * .74, hy + hr * .3);
+      a.closePath();
+      a.fillStyle = ha('#bf6478', .92); a.fill();
+      a.beginPath();
+      a.moveTo(hx - hr * .74, hy + hr * .3); a.lineTo(hx - hr * .74, hy + hr * .46);
+      a.strokeStyle = ha('#2a3146', .5); a.lineWidth = hr * .05; a.stroke();
+      /* vằn trán và má */
+      a.lineCap = 'round';
+      for (let j = -1; j <= 1; j++) {
+        a.beginPath();
+        a.moveTo(hx + j * hr * .3 - hr * .02, hy - hr * .82);
+        a.quadraticCurveTo(hx + j * hr * .34 + hr * .04, hy - hr * .46,
+                           hx + j * hr * .22 + hr * .02, hy - hr * .24);
+        a.strokeStyle = ha('#16203a', .8); a.lineWidth = hr * .11; a.stroke();
+      }
+      [-1, 1].forEach(sg => {
+        for (let j = 0; j < 2; j++) {
+          a.beginPath();
+          a.moveTo(hx + hr * (.5 + j * .18), hy + hr * (sg * .3 + .18));
+          a.quadraticCurveTo(hx + hr * (.26 + j * .18), hy + hr * (sg * .44 + .2),
+                             hx + hr * (.02 + j * .16), hy + hr * (sg * .4 + .22));
+          a.strokeStyle = ha('#16203a', .5); a.lineWidth = hr * .07; a.stroke();
+        }
+      });
+      /* mắt */
+      [-1, 1].forEach(sg => {
+        const ex = hx - hr * .14 + sg * hr * .34, ey = hy - hr * .1 + (sg < 0 ? hr * .1 : 0);
+        a.save(); a.globalCompositeOperation = 'lighter';
+        quang(a, ex, ey, hr * .8, '#5dffe8', .32, '#2fb6ff', .1);
+        a.restore();
+        a.save();
+        a.translate(ex, ey); a.rotate(-.16);
+        a.beginPath();                                  /* mắt hí, đuôi xếch */
+        a.moveTo(-hr * .24, hr * .01);
+        a.quadraticCurveTo(-hr * .04, -hr * .13, hr * .24, -hr * .05);
+        a.quadraticCurveTo(-hr * .02, hr * .12, -hr * .24, hr * .01);
+        a.closePath();
+        a.fillStyle = ha('#2fe6d0', .97); a.fill();
+        a.beginPath(); a.ellipse(0, 0, hr * .05, hr * .075, 0, 0, 6.2832);
+        a.fillStyle = 'rgba(8,12,24,.96)'; a.fill();
+        a.beginPath(); a.arc(-hr * .05, -hr * .04, hr * .028, 0, 6.2832);
+        a.fillStyle = 'rgba(255,255,255,.9)'; a.fill();
+        a.restore();
+        a.beginPath();                                  /* gờ mày */
+        a.moveTo(ex - hr * .3, ey - hr * .14);
+        a.quadraticCurveTo(ex, ey - hr * .3, ex + hr * .28, ey - hr * .16);
+        a.strokeStyle = ha('#16203a', .62);
+        a.lineWidth = hr * .07; a.stroke();
+      });
+
+      /* bóng dưới chân */
+      const sh = a.createRadialGradient(cx, gy, 0, cx, gy, S * 1.05);
+      sh.addColorStop(0, ha('#2a3550', .17));
+      sh.addColorStop(1, ha('#2a3550', 0));
+      a.fillStyle = sh;
+      a.beginPath(); a.ellipse(cx, gy, S * 1.05, S * .1, 0, 0, 6.2832); a.fill();
+    };
+
+    const LINH = [veHuyenVu, veThanhLong, veChuTuoc, veBachHo];
+    const MOC = [[0, .26], [1 / 3, .22], [2 / 3, .22], [1, .26]];
+
+    const drawLinhThu = (a, s, waterY) => {
+      for (let i = 0; i < 4; i++) {
+        const k = hien(MOC[i][0], MOC[i][1]);
+        if (k < .015) continue;
+        a.save();
+        a.globalAlpha = clamp(k, 0, 1);
+        LINH[i](a, s, waterY, k);
+        a.restore();
+      }
     };
 
     /* ══ VÒNG MỘT NÉT ══
@@ -504,11 +1171,11 @@ window.SONTHUY = (() => {
       });
 
       /* các yếu tố xếp theo chiều sâu: mảnh mực lẫn trong tầng núi, gió vắt
-         ngang trước núi, ngọc đứng trước cùng, tàn lửa bốc lên trên hết */
+         ngang trước núi, linh thú đứng trước cùng, tàn lửa bốc lên trên hết */
       drawEnso(a, s);
       drawSon(a, s);
       drawPhong(a, s);
-      drawNgoc(a, s, waterY);
+      drawLinhThu(a, s, waterY);
       drawHoa(a, s, waterY);
 
       /* chỉnh màu cả khuôn hình theo hồi — như grade một thước phim */

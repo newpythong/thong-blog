@@ -150,7 +150,7 @@
     /* Đoạn ghim chỉ dài hơn một màn hình một chút: cảnh vật đổi màu theo
        cuộn, không còn nhân vật nào phải chờ tới lượt, nên kéo dài nữa chỉ
        làm người đọc mỏi tay. */
-    const DAI_GHIM = 1.2;
+    const DAI_GHIM = () => Math.max(1, (acts.length - 1) * .62);
 
     if (!hasGSAP || RM) {
       /* không có thư viện hoặc người dùng tắt chuyển động:
@@ -173,7 +173,7 @@
         scrollTrigger: {
           trigger: stage,
           start: 'top top',
-          end: () => '+=' + (innerHeight * DAI_GHIM),
+          end: () => '+=' + (innerHeight * DAI_GHIM()),
           pin: inner,
           pinSpacing: true,
           scrub: 1.1,
@@ -198,12 +198,14 @@
         /* Hồi sau chỉ vào khi hồi trước đã khuất hẳn: ra xong ở 0.78 của một
            đoạn, vào bắt đầu ở 0.80. Trước đây hai mốc chồng nhau nên có lúc
            thấy hai đầu đề đè lên nhau. */
+        /* hồi sau chỉ còn mỗi chữ, không có đề dẫn hay câu phụ — phải
+           kiểm tra trước khi giao cho gsap, giao null thì nó kêu suốt */
         if (i > 0) {
           tl.set(el, { visibility: 'visible' }, at - seg * 0.20)
             .fromTo(el, { opacity: 0 }, { opacity: 1, duration: seg * 0.20, ease: 'power2.out' }, at - seg * 0.20)
-            .fromTo(brow, { opacity: 0, y: 16 }, { opacity: 1, y: 0, duration: seg * 0.18, ease: 'power2.out' }, at - seg * 0.18)
-            .to(words, { yPercent: 0, y: 0, duration: seg * 0.34, ease: 'expo.out', stagger: seg * 0.035 }, at - seg * 0.19)
-            .to(sub, { opacity: 1, y: 0, duration: seg * 0.24, ease: 'power2.out' }, at - seg * 0.08);
+            .to(words, { yPercent: 0, y: 0, duration: seg * 0.34, ease: 'expo.out', stagger: seg * 0.035 }, at - seg * 0.19);
+          if (brow) tl.fromTo(brow, { opacity: 0, y: 16 }, { opacity: 1, y: 0, duration: seg * 0.18, ease: 'power2.out' }, at - seg * 0.18);
+          if (sub) tl.to(sub, { opacity: 1, y: 0, duration: seg * 0.24, ease: 'power2.out' }, at - seg * 0.08);
         }
         /* hồi trước lùi ra sau, chữ chìm xuống — như một cú cắt cảnh */
         if (i < N - 1) {

@@ -318,19 +318,20 @@ window.SONTHUY = (() => {
     };
 
     /* ══ CẢNH VẬT ══
-       Núi gần, mây, tre trúc, cành đào — vẽ phẳng, viền mực, theo lối
-       thuỷ mặc. Trọng số lấy luôn từ bốn yếu tố của hồi (sơn, phong, hoả,
-       thuỷ) nên cảnh vẫn luân chuyển theo cuộn mà không cần thêm máy móc
-       gì. Chỗ này trước là bốn linh thú; vẽ con vật bằng canvas khó ra
-       hồn, cảnh vật thì hợp với nét phẳng hơn nhiều. */
+       Núi gần, mây, tre trúc, cành đào.
 
-    const ha = (h, al) => rgba(hex(h), al);
-    const MUC = '#241f1a';
+       Vẽ cùng một lối với tầng núi sẵn có: mảng màu pha loãng về phía
+       trời, không viền mực, có dải sương phủ chân. Bản trước viền đậm
+       nét cứng nên đứng tách hẳn khỏi nền — cảnh vẽ kiểu này phải chìm
+       vào không khí thì mới ăn với nhau.
 
-    const to = (a, mau, lw, vienMau) => {
-      if (mau) { a.fillStyle = mau; a.fill(); }
-      if (lw) { a.lineWidth = lw; a.strokeStyle = vienMau || MUC; a.lineJoin = 'round'; a.stroke(); }
-    };
+       Trọng số lấy luôn từ bốn yếu tố của hồi (sơn, phong, hoả, thuỷ)
+       nên cảnh vẫn luân chuyển theo cuộn mà không cần thêm gì. */
+
+    const TROI = '#fdf6e6';
+    /* xa = 0 thì đậm như mực của hồi, xa = 1 thì tan hẳn vào trời */
+    const sacXa = (s, xa) => mixHex(rgbHex(s.ink), TROI, clamp(xa, 0, 1));
+    const sacLuc = (s, xa) => mixHex(rgbHex(mixHex(rgbHex(s.ink), '#4c6340', .5)), TROI, clamp(xa, 0, 1));
 
     const spl = (K, n) => {
       const P = [], pt = i => K[clamp(i, 0, K.length - 1)];
@@ -360,8 +361,8 @@ window.SONTHUY = (() => {
       return N;
     };
 
-    const dai = (a, P, N, wf) => {
-      const n = P.length, A = [], B = [];
+    const dai = (a, P, wf) => {
+      const N = phapTuyen(P), n = P.length, A = [], B = [];
       for (let i = 0; i < n; i++) {
         const w = wf(i / (n - 1)), nx = N[i][0], ny = N[i][1];
         A.push([P[i][0] + nx * w, P[i][1] + ny * w]);
@@ -372,7 +373,7 @@ window.SONTHUY = (() => {
       for (let i = n - 1; i >= 0; i--) a.lineTo(B[i][0], B[i][1]);
       a.closePath();
     };
-    const net = (a, P, wf, mau, lw, vienMau) => { dai(a, P, phapTuyen(P), wf); to(a, mau, lw, vienMau); };
+    const net = (a, P, wf, mau) => { dai(a, P, wf); a.fillStyle = mau; a.fill(); };
 
     const cung = (ax, ay, bx, by, bow, n) => {
       const mx = (ax + bx) / 2, my = (ay + by) / 2;
@@ -386,86 +387,75 @@ window.SONTHUY = (() => {
       return P;
     };
 
-    /* ── MÂY ──
-       Mây tường vân: một dãy vòm tròn chồng lên nhau, đáy phẳng, đuôi
-       cuộn. Tô một lượt liền khối rồi viền nhẹ ở vòm trên. */
-    const mayHinh = (a, x, y, w) => {
-      const h = w * .17;
-      a.beginPath();
-      a.moveTo(x, y);
-      for (let i = 0; i < 5; i++) {
-        const r = h * (.62 + .38 * Math.sin(i * 1.9 + x * .01));
-        a.arc(x + w * (.12 + i * .2), y - r * .35, r, Math.PI, 0, false);
-      }
-      a.lineTo(x + w, y);
-      a.closePath();
+    /* sương phủ chân một hình vừa vẽ — gọi trong lúc còn clip */
+    const suong = (a, y0, y1, dam) => {
+      const g = a.createLinearGradient(0, y0, 0, y1);
+      g.addColorStop(0, 'rgba(251,243,223,0)');
+      g.addColorStop(1, 'rgba(251,243,223,' + dam + ')');
+      a.fillStyle = g;
+      a.fillRect(0, y0, W, y1 - y0);
     };
+
+    /* ── MÂY ── mây tường vân, chỉ là mảng sáng mờ trôi ngang */
     const veMay = (a, s, k) => {
       if (k < .03) return;
       for (let i = 0; i < 5; i++) {
         const r1 = frac(i * 3.31 + 1.7), r2 = frac(i * 7.13 + 5.2);
-        const w = W * (.10 + r2 * .11);
+        const w = W * (.11 + r2 * .11), h = w * .17;
         const x = ((t * (4 + r2 * 9) + r1 * 5200) % (W + w * 2)) - w;
         const y = H * (.08 + r1 * .30) + Math.sin(t * .2 + i * 1.6) * H * .008;
-        const al = k * (.22 + r2 * .22);
         a.save();
-        a.globalAlpha *= al;
-        mayHinh(a, x, y, w);
-        to(a, 'rgba(255,252,242,.95)', Math.max(1, W * .0011), rgba(s.ink, .5));
-        a.beginPath();                                  // đuôi cuộn
-        a.arc(x + w * .04, y - w * .05, w * .055, Math.PI * .4, Math.PI * 1.9);
-        a.lineWidth = Math.max(1, W * .0011); a.strokeStyle = rgba(s.ink, .45); a.stroke();
+        a.globalAlpha *= k * (.20 + r2 * .2);
+        a.beginPath();
+        a.moveTo(x, y);
+        for (let j = 0; j < 5; j++) {
+          const r = h * (.62 + .38 * Math.sin(j * 1.9 + x * .01));
+          a.arc(x + w * (.12 + j * .2), y - r * .35, r, Math.PI, 0, false);
+        }
+        a.lineTo(x + w, y);
+        a.closePath();
+        a.fillStyle = 'rgba(255,251,240,.9)';
+        a.fill();
         a.restore();
       }
     };
 
-    /* ── NÚI GẦN ──
-       Một khối núi thẫm mọc lên khỏi mặt nước ở mé phải, thêm vài nhát
-       gân đá. Tầng núi xa đã có sẵn; khối này để cảnh có chiều sâu. */
+    /* ── NÚI GẦN ── một khối thẫm mọc lên khỏi mặt nước ở mé phải */
     const veNui = (a, s, waterY, k) => {
       if (k < .03) return;
-      const x0 = W * .58, x1 = W * 1.08, dinh = W * .78;
       const cao = H * (.17 + s.dolly * .05);
-      a.save();
-      a.globalAlpha *= k;
-      /* sống núi gãy nhiều nhịp — ba bốn nhịp thì ra cái nêm, không ra núi */
       const SONG = [[.580, 0], [.618, .16], [.642, .11], [.668, .40], [.692, .33],
                     [.712, .55], [.738, .48], [.762, .86], [.780, 1], [.800, .74],
                     [.822, .80], [.848, .52], [.872, .60], [.906, .30], [.944, .34],
                     [1.08, 0]];
+      a.save();
+      a.globalAlpha *= k;
       a.beginPath();
-      a.moveTo(x0, waterY + 2);
+      a.moveTo(W * .58, waterY + 2);
       SONG.forEach(q => a.lineTo(W * q[0], waterY - cao * q[1]));
       a.closePath();
-      to(a, rgba(s.ink, .42), Math.max(1, W * .0012), rgba(s.ink, .62));
-      for (let i = 0; i < 4; i++) {                      // gân đá
-        const u = i / 3;
-        a.beginPath();
-        a.moveTo(mix(W * .70, W * .88, u), waterY - cao * (.72 - u * .28));
-        a.lineTo(mix(W * .68, W * .92, u), waterY - cao * (.18 - u * .06));
-        a.lineWidth = Math.max(1, W * .0011);
-        a.strokeStyle = rgba(s.ink, .3); a.stroke();
-      }
+      a.clip();
+      const g = a.createLinearGradient(0, waterY - cao, 0, waterY);
+      g.addColorStop(0, rgba(sacXa(s, .42), .88));
+      g.addColorStop(1, rgba(sacXa(s, .1), .88));
+      a.fillStyle = g;
+      a.fillRect(W * .55, waterY - cao - 2, W * .55, cao + 6);
+      suong(a, waterY - cao * .55, waterY + 2, .5);
       a.restore();
     };
 
-    /* ── TRE TRÚC ──
-       Mấy thân trúc mọc từ mé nước lên khỏi khung, có đốt, lá thành chùm
-       ba bốn lá hình mác. */
-    const laTruc = (a, x, y, ang, len, mau, lw) => {
-      const P = cung(x, y, x + Math.cos(ang) * len, y + Math.sin(ang) * len, len * .16, 10);
-      net(a, P, u => len * .085 * Math.sin(Math.PI * clamp(u * 1.08, 0, 1)), mau, lw);
-    };
+    /* ── TRE TRÚC ── mấy thân mọc từ mé nước lên khỏi khung */
     const veTruc = (a, s, waterY, k) => {
       if (k < .03) return;
-      const lam = rgbHex(mixHex(rgbHex(s.ink), '#2f5b3a', .5));
-      const lw = Math.max(1, W * .0013);
+      const than = rgba(sacLuc(s, .34), .62);
+      const la = rgba(sacLuc(s, .18), .66);
+      const dot = rgba(sacLuc(s, .05), .3);
       a.save();
       a.globalAlpha *= k;
       for (let i = 0; i < 5; i++) {
         const r1 = frac(i * 4.7 + .3), r2 = frac(i * 9.1 + 2.8);
         const x = W * (.755 + i * .048 + r1 * .02);
-        const w = W * (.0042 + r2 * .0034);
+        const w = W * (.0038 + r2 * .003);
         const ngon = -H * (.02 + r1 * .1);
         const gio = Math.sin(t * .28 + i * 1.3) * W * .006;
         const P = [];
@@ -473,69 +463,62 @@ window.SONTHUY = (() => {
           const u = j / 10;
           P.push([x + gio * u * u + Math.sin(u * 1.4 + i) * w * 1.6, mix(waterY + H * .01, ngon, u)]);
         }
-        net(a, P, u => w * (1 - u * .42), rgba(hex(lam), .88), lw);
+        net(a, P, u => w * (1 - u * .42), than);
         for (let d = 1; d < 7; d++) {                    // đốt
           const u = d / 7, q = P[Math.round(u * 10)];
           a.beginPath();
-          a.moveTo(q[0] - w * 1.25, q[1]); a.lineTo(q[0] + w * 1.25, q[1]);
-          a.lineWidth = lw * 1.3; a.strokeStyle = rgba(s.ink, .55); a.stroke();
+          a.moveTo(q[0] - w * 1.2, q[1]); a.lineTo(q[0] + w * 1.2, q[1]);
+          a.lineWidth = Math.max(1, W * .0012); a.strokeStyle = dot; a.stroke();
         }
         for (let c = 0; c < 3; c++) {                    // chùm lá
           const u = .42 + c * .2 + r1 * .06;
           const q = P[Math.round(u * 10)];
           const sg = c % 2 ? 1 : -1;
-          for (let l = -1; l <= 1; l++)
-            laTruc(a, q[0], q[1], (sg > 0 ? -.35 : Math.PI + .35) + l * .38 + Math.sin(t * .4 + c + l) * .05,
-                   W * (.028 + r2 * .016), rgba(hex(lam), .82), lw);
+          for (let l = -1; l <= 1; l++) {
+            const ang = (sg > 0 ? -.35 : Math.PI + .35) + l * .38 + Math.sin(t * .4 + c + l) * .05;
+            const len = W * (.028 + r2 * .016);
+            net(a, cung(q[0], q[1], q[0] + Math.cos(ang) * len, q[1] + Math.sin(ang) * len,
+                        len * .16, 10),
+                uu => len * .08 * Math.sin(Math.PI * clamp(uu * 1.08, 0, 1)), la);
+          }
         }
       }
+      /* chân trúc chìm vào dải sương ở mé nước, như tầng núi */
+      suong(a, waterY - H * .1, waterY + H * .01, .62);
       a.restore();
     };
 
-    /* ── CÀNH ĐÀO ──
-       Một cành thò vào từ góc trên bên phải, hoa năm cánh và vài nụ. */
-    const hoaDao = (a, x, y, r, quay, lw, s) => {
-      for (let i = 0; i < 5; i++) {
-        const g = quay + i / 5 * 6.2832;
-        a.beginPath();
-        a.ellipse(x + Math.cos(g) * r * .62, y + Math.sin(g) * r * .62, r * .52, r * .44, g, 0, 6.2832);
-        to(a, 'rgba(244,196,206,.95)', lw, rgba(s.ink, .45));
-      }
-      a.beginPath(); a.arc(x, y, r * .3, 0, 6.2832);
-      to(a, 'rgba(252,232,214,.98)', lw, rgba(s.ink, .4));
-      for (let i = 0; i < 5; i++) {
-        const g = quay + .6 + i / 5 * 6.2832;
-        a.beginPath();
-        a.moveTo(x, y); a.lineTo(x + Math.cos(g) * r * .5, y + Math.sin(g) * r * .5);
-        a.lineWidth = lw * .8; a.strokeStyle = rgba(s.ink, .5); a.stroke();
-      }
-    };
+    /* ── CÀNH ĐÀO ── một cành thò vào từ góc trên bên phải */
     const veDao = (a, s, k) => {
       if (k < .03) return;
-      const lw = Math.max(1, W * .0012);
+      const go = rgba(sacXa(s, .22), .6);
       const gio = Math.sin(t * .26) * W * .004;
       a.save();
       a.globalAlpha *= k;
-      const goc = [W * 1.04, -H * .02];
-      const CANH = [
-        [[goc[0], goc[1]], [W * .92, H * .06], [W * .80, H * .10], [W * .66, H * .09 + gio]],
-        [[W * .88, H * .075], [W * .84, H * .17], [W * .78, H * .24 + gio]],
-        [[W * .78, H * .102], [W * .72, H * .05], [W * .63, H * .028 + gio]]
-      ];
-      CANH.forEach((K, i) => {
-        const P = spl(K, 10);
-        net(a, P, u => W * (.0055 - i * .0014) * (1 - u * .62), rgba(s.ink, .82), lw);
-      });
+      [[[W * 1.04, -H * .02], [W * .92, H * .06], [W * .80, H * .10], [W * .66, H * .09 + gio]],
+       [[W * .88, H * .075], [W * .84, H * .17], [W * .78, H * .24 + gio]],
+       [[W * .78, H * .102], [W * .72, H * .05], [W * .63, H * .028 + gio]]
+      ].forEach((K, i) =>
+        net(a, spl(K, 10), u => W * (.0048 - i * .0012) * (1 - u * .62), go));
+
       const HOA = [[.66, .09], [.70, .075], [.755, .10], [.79, .235], [.815, .185],
                    [.845, .12], [.875, .085], [.655, .032], [.70, .04], [.755, .055], [.93, .05]];
       HOA.forEach((h, i) => {
         const r = W * (.0072 + frac(i * 5.3) * .0036);
-        hoaDao(a, W * h[0] + gio * .6, H * h[1], r, i * 1.1 + t * .02, lw, s);
-      });
-      [[.735, .155], [.80, .05], [.865, .175], [.70, .21]].forEach((b, i) => {
+        const x = W * h[0] + gio * .6, y = H * h[1], quay = i * 1.1;
         a.beginPath();
-        a.arc(W * b[0] + gio * .6, H * b[1], W * .0038, 0, 6.2832);
-        to(a, 'rgba(226,150,168,.95)', lw, rgba(s.ink, .45));
+        for (let j = 0; j < 5; j++) {
+          const gq = quay + j / 5 * 6.2832;
+          a.ellipse(x + Math.cos(gq) * r * .6, y + Math.sin(gq) * r * .6, r * .52, r * .46, gq, 0, 6.2832);
+        }
+        a.fillStyle = 'rgba(234,180,190,.8)'; a.fill();
+        a.beginPath(); a.arc(x, y, r * .26, 0, 6.2832);
+        a.fillStyle = 'rgba(247,225,196,.9)'; a.fill();
+      });
+      [[.735, .155], [.80, .05], [.865, .175], [.70, .21]].forEach(b => {
+        a.beginPath();
+        a.arc(W * b[0] + gio * .6, H * b[1], W * .0036, 0, 6.2832);
+        a.fillStyle = 'rgba(222,158,172,.8)'; a.fill();
       });
       a.restore();
     };

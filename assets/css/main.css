@@ -21,6 +21,7 @@
   --dat:      #8c5a22;   /* đất nung */
   --son:      #b4441f;   /* son */
   --tram:     #392b19;   /* trầm — dải tương phản */
+  --thu-phap: 'Dancing Script', 'Newsreader', Georgia, serif;
   --tram-2:   #4a3823;
 
   /* ngữ nghĩa — mặc định là nền sáng */
@@ -230,12 +231,17 @@ section{ position:relative; }
    khi stroke-dashoffset đổi. Vẽ lên canvas vừa hết lỗi, vừa cho nét bút
    thật và soi được xuống mặt nước. */
 
-.zen__w{ position:relative; z-index:1; margin:0;
-  font-family:var(--serif); font-weight:200; color:var(--tram);
-  font-size:clamp(3.2rem,13vw,7.6rem); line-height:.96; letter-spacing:.02em; }
-.zen__w .ln{ display:block; overflow:hidden;
-  padding-top:.14em; margin-top:-.14em; padding-bottom:.08em; margin-bottom:-.08em; }
-.zen__w em{ font-style:italic; font-weight:200; color:var(--tram); }
+/* Chữ lớn ở sân khấu dùng nét thư pháp. Font kiểu bút lông có dấu tiếng
+   Việt chồng cao hơn hẳn font thường, nên phải nới đệm trên dưới của mỗi
+   dòng, không thì dấu ngã và dấu nặng bị mặt nạ cắt cụt. */
+/* phải đủ mạnh hơn luật .act h1 ở trên, nếu không font và cỡ chữ vẫn bị
+   luật kia đè — đã vấp đúng bẫy này một lần với màu chữ */
+.act .zen__w, .act .chu{ position:relative; z-index:1; margin:0;
+  font-family:var(--thu-phap); font-weight:600; color:var(--tram);
+  font-size:clamp(3.4rem,14vw,8.4rem); line-height:1.04; letter-spacing:.005em;
+  text-align:center; }
+.act .zen__w .ln, .act .chu .ln{ display:block; overflow:hidden;
+  padding-top:.30em; margin-top:-.30em; padding-bottom:.22em; margin-bottom:-.22em; }
 
 /* chấm son thay cho con dấu */
 .zen__seal{ position:absolute; z-index:1; width:7px; height:7px; border-radius:50%;
@@ -524,8 +530,4 @@ textarea.inp{ font-family:var(--mono); line-height:1.75; resize:vertical; }
 
 /* ── hồi sau: mỗi hồi một chữ, căn giữa như Tiêu Dao ───── */
 .act--chu{ align-self:center; padding-block:0; text-align:center; }
-.chu{ margin:0; font-family:var(--serif); font-weight:200; font-style:italic;
-  font-size:clamp(3.4rem,13vw,7.6rem); line-height:1; letter-spacing:.02em;
-  color:var(--tram); }
-.chu .rv-w{ padding-top:.2em; margin-top:-.2em;
-  padding-bottom:.14em; margin-bottom:-.14em; }
+
